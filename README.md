@@ -230,4 +230,3 @@ If you encounter issues, check the browser console for errors and ensure your AP
 
 This project is licensed under the MIT License.  
 See [`LICENSE`](./LICENSE) for details.
-```
