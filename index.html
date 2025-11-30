@@ -89,99 +89,15 @@
                 min-width: 0;
             }
 
-            #sidebar {
-                display: none;
-                flex-direction: column;
-                max-height: 500px;
-                width: 100%;
-                padding: 16px;
-                background: linear-gradient(145deg, #0a0f1f, #020617 40%);
-                border-top: 1px solid var(--border-subtle);
-            }
-
-            #sidebar.visible {
-                display: flex;
-            }
-
-            #sidebar-header {
-                padding: 12px 16px;
-                border-bottom: 1px solid var(--border-subtle);
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: rgba(15, 23, 42, 0.9);
-            }
-
-            #sidebar-header h3 {
-                margin: 0;
-                font-size: 14px;
-                font-weight: 600;
-                color: var(--text-main);
-            }
-
-            #sidebar-close-btn {
-                background: transparent;
-                border: none;
-                color: var(--text-muted);
-                font-size: 24px;
-                cursor: pointer;
-                padding: 0;
-                width: 28px;
-                height: 28px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 4px;
-                line-height: 1;
-            }
-
-            #sidebar-close-btn:hover {
-                background: #1f2937;
-                color: var(--text-main);
-            }
-
-            #sidebar-content {
-                flex: 1;
-                overflow-y: scroll;
-                scrollbar-gutter: stable;
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            #sidebar-content::-webkit-scrollbar {
-                width: 10px;
-                -webkit-appearance: none;
-            }
-
-            #sidebar-content::-webkit-scrollbar-track {
-                background: #0a0f1f;
-                border-left: 1px solid #1f2937;
-                border-radius: 8px;
-                -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-            }
-
-            #sidebar-content::-webkit-scrollbar-thumb {
-                background: linear-gradient(180deg, #1f2937, #111827);
-                border-radius: 8px;
-                border: 1px solid #4b5563;
-                min-height: 30px;
-            }
-
-            #sidebar-content::-webkit-scrollbar-thumb:hover {
-                background: linear-gradient(180deg, #374151, #1f2937);
-                border-color: #6b7280;
-            }
-
-            .sidebar-section {
+            .settings-section {
                 margin-bottom: 24px;
             }
 
-            .sidebar-section:last-child {
+            .settings-section:last-child {
                 margin-bottom: 0;
             }
 
-            .sidebar-label {
+            .settings-label {
                 display: block;
                 margin-bottom: 8px;
                 font-size: 12px;
@@ -189,7 +105,7 @@
                 font-weight: 600;
             }
 
-            .sidebar-input {
+            .settings-input {
                 width: 100%;
                 padding: 8px 12px;
                 background: #020617;
@@ -201,11 +117,11 @@
                 outline: none;
             }
 
-            .sidebar-input:focus {
+            .settings-input:focus {
                 border-color: #3b82f6;
             }
 
-            .sidebar-textarea {
+            .settings-textarea {
                 width: 100%;
                 min-height: 400px;
                 max-height: 600px;
@@ -221,11 +137,11 @@
                 outline: none;
             }
 
-            .sidebar-textarea:focus {
+            .settings-textarea:focus {
                 border-color: #3b82f6;
             }
 
-            .sidebar-hint {
+            .settings-hint {
                 margin-top: 6px;
                 font-size: 11px;
                 color: var(--text-muted);
@@ -2081,9 +1997,9 @@
                                     >System Prompt / Context</label
                                 >
                                 <textarea
-                                    id="sidebar-context-input"
+                                    id="settings-context-input"
                                     placeholder="You are an AI assistant..."
-                                    class="sidebar-textarea"
+                                    class="settings-textarea"
                                     style="min-height: 200px; max-height: 350px"
                                 ></textarea>
                                 <div class="settings-hint">
@@ -2097,7 +2013,7 @@
                                     >Pinned Context Pairs</label
                                 >
                                 <div
-                                    id="sidebar-pinned-list"
+                                    id="settings-pinned-list"
                                     style="
                                         font-size: 12px;
                                         color: var(--text-muted);
@@ -2123,7 +2039,7 @@
                                     </button>
                                 </div>
                                 <div
-                                    id="sidebar-active-list"
+                                    id="settings-active-list"
                                     style="
                                         font-size: 12px;
                                         color: var(--text-muted);
@@ -2275,8 +2191,8 @@
             const nextPageBtn = document.getElementById("next-page");
             const settingsBtn = document.getElementById("settings-btn");
             const settingsView = document.getElementById("settings-view");
-            const sidebarContextInput = document.getElementById(
-                "sidebar-context-input",
+            const settingsContextInput = document.getElementById(
+                "settings-context-input",
             );
             const historyLimitDisplay = document.getElementById(
                 "history-limit-display",
@@ -2289,11 +2205,11 @@
                 document.getElementById("page-size-display");
             const pageSizeDec = document.getElementById("page-size-dec");
             const pageSizeInc = document.getElementById("page-size-inc");
-            const sidebarPinnedList = document.getElementById(
-                "sidebar-pinned-list",
+            const settingsPinnedList = document.getElementById(
+                "settings-pinned-list",
             );
-            const sidebarActiveList = document.getElementById(
-                "sidebar-active-list",
+            const settingsActiveList = document.getElementById(
+                "settings-active-list",
             );
             const activePrevPageBtn =
                 document.getElementById("active-prev-page");
@@ -2487,16 +2403,16 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 return currentChatName;
             }
 
-            // Update pinned pairs list in sidebar
+            // Update pinned pairs list in settings view
             function updatePinnedList() {
                 const pinnedPairs = conversationPairs.filter(
                     (p) => p.pinned === true,
                 );
 
-                sidebarPinnedList.innerHTML = "";
+                settingsPinnedList.innerHTML = "";
 
                 if (pinnedPairs.length === 0) {
-                    sidebarPinnedList.innerHTML =
+                    settingsPinnedList.innerHTML =
                         '<div style="color: var(--text-muted); font-style: italic;">No pinned pairs</div>';
                     return;
                 }
@@ -2604,7 +2520,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         row.appendChild(avatarContainer);
                         row.appendChild(content);
-                        sidebarPinnedList.appendChild(row);
+                        settingsPinnedList.appendChild(row);
                         return;
                     }
 
@@ -2744,18 +2660,18 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     assistantRow.appendChild(assistantContent);
 
                     pairContainer.appendChild(assistantRow);
-                    sidebarPinnedList.appendChild(pairContainer);
+                    settingsPinnedList.appendChild(pairContainer);
                 });
 
                 // Enhance code blocks in pinned list
                 const codeBlocks =
-                    sidebarPinnedList.querySelectorAll("pre code");
+                    settingsPinnedList.querySelectorAll("pre code");
                 codeBlocks.forEach((block) => {
                     hljs.highlightElement(block);
                 });
             }
 
-            // Update active context pairs list in sidebar
+            // Update active context pairs list in settings view
             function updateActiveList() {
                 // Get regular included pairs (excluding pinned ones)
                 const recentPairs = conversationPairs.filter(
@@ -2768,10 +2684,10 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         ? recentPairs
                         : recentPairs.slice(-HISTORY_LIMIT);
 
-                sidebarActiveList.innerHTML = "";
+                settingsActiveList.innerHTML = "";
 
                 if (limitedPairs.length === 0) {
-                    sidebarActiveList.innerHTML =
+                    settingsActiveList.innerHTML =
                         '<div style="color: var(--text-muted); font-style: italic;">No active context pairs</div>';
                     activePageInfo.textContent = "";
                     activePrevPageBtn.disabled = true;
@@ -2805,7 +2721,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 summaryDiv.style.fontSize = "12px";
                 summaryDiv.style.color = "var(--text-muted)";
                 summaryDiv.innerHTML = `<strong>${totalPairs} pair(s)</strong> in active context (limit: ${HISTORY_LIMIT === 0 ? "∞" : HISTORY_LIMIT})`;
-                sidebarActiveList.appendChild(summaryDiv);
+                settingsActiveList.appendChild(summaryDiv);
 
                 pagePairs.forEach((pair) => {
                     const globalIndex = conversationPairs.indexOf(pair);
@@ -2900,7 +2816,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         row.appendChild(avatarContainer);
                         row.appendChild(content);
-                        sidebarActiveList.appendChild(row);
+                        settingsActiveList.appendChild(row);
                     } else {
                         // ===== EXPANDED VIEW =====
                         const pairContainer = document.createElement("div");
@@ -3033,13 +2949,13 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         assistantRow.appendChild(assistantContent);
 
                         pairContainer.appendChild(assistantRow);
-                        sidebarActiveList.appendChild(pairContainer);
+                        settingsActiveList.appendChild(pairContainer);
                     }
                 });
 
                 // Enhance code blocks in active list
                 const codeBlocks =
-                    sidebarActiveList.querySelectorAll("pre code");
+                    settingsActiveList.querySelectorAll("pre code");
                 codeBlocks.forEach((block) => {
                     hljs.highlightElement(block);
                 });
@@ -3056,7 +2972,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 updateActiveList();
             });
 
-            // Toggle sidebar
+            // Toggle settings view
             settingsBtn.addEventListener("click", () => {
                 const isSettingsVisible =
                     settingsView.classList.contains("visible");
@@ -3067,7 +2983,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     settingsBtn.classList.remove("active");
                 } else {
                     // Switch to settings view
-                    sidebarContextInput.value = currentContextPrompt;
+                    settingsContextInput.value = currentContextPrompt;
                     activeContextPage = 1; // Reset to page 1 when opening settings
                     updatePinnedList();
                     updateActiveList();
@@ -3079,8 +2995,8 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
             // Close settings button
             // Auto-save context prompt
-            sidebarContextInput.addEventListener("input", () => {
-                currentContextPrompt = sidebarContextInput.value;
+            settingsContextInput.addEventListener("input", () => {
+                currentContextPrompt = settingsContextInput.value;
                 localStorage.setItem(CONTEXT_STORAGE_KEY, currentContextPrompt);
             });
 
@@ -3912,16 +3828,45 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         const pill = document.createElement("div");
                         pill.className = "input-attachment-pill";
 
+                        // Add toggle state styling
+                        if (f.include === false) {
+                            pill.style.opacity = "0.4";
+                            pill.style.background = "#1f2937";
+                            pill.style.borderColor = "#374151";
+                        }
+
+                        // Make the pill clickable to toggle inclusion
+                        pill.style.cursor = "pointer";
+
                         const label = document.createElement("span");
                         label.textContent = f.name;
-                        label.title = f.name;
+                        label.title = `${f.name} - Click to ${f.include !== false ? "exclude" : "include"}`;
+
+                        // Toggle attachment inclusion when clicking the pill
+                        pill.addEventListener("click", (e) => {
+                            // Don't toggle if clicking the remove button
+                            if (e.target === removeBtn) return;
+
+                            attachedFiles[idx].include =
+                                !attachedFiles[idx].include;
+                            renderAttachments();
+                            saveConversationToLocal();
+                            const status = attachedFiles[idx].include
+                                ? "included"
+                                : "excluded";
+                            updateStatus(
+                                `Attachment ${status} from context.`,
+                                "success",
+                            );
+                        });
 
                         const removeBtn = document.createElement("button");
                         removeBtn.className = "input-attachment-remove";
                         removeBtn.textContent = "×";
                         removeBtn.title = "Remove attachment";
 
-                        removeBtn.addEventListener("click", () => {
+                        removeBtn.addEventListener("click", (e) => {
+                            e.stopPropagation(); // Prevent toggling when removing
                             attachedFiles.splice(idx, 1);
                             attachedFileObjects.splice(idx, 1);
                             renderAttachments();
@@ -3951,6 +3896,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                 attachedFiles.push({
                                     name: file.name,
                                     content: reader.result,
+                                    include: true, // Default to included
                                 });
                                 resolve();
                             };
@@ -5243,10 +5189,13 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 try {
                     let assistantText = "";
 
-                    // Gather attachments/files info
+                    // Gather attachments/files info (only included ones)
                     let fileInstructions = "";
-                    if (attachedFiles.length > 0) {
-                        const summary = attachedFiles
+                    const includedFiles = attachedFiles.filter(
+                        (f) => f.include !== false,
+                    );
+                    if (includedFiles.length > 0) {
+                        const summary = includedFiles
                             .map((f, idx) => `[FILE ${idx + 1}] ${f.name}`)
                             .join(", ");
 
@@ -5254,7 +5203,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             `You have access to the following attached files in this conversation: ${summary}.\n` +
                             `When the user refers to a file by name or by [FILE n], use the corresponding file content provided in the system messages.`;
 
-                        attachedFiles.forEach((f, idx) => {
+                        includedFiles.forEach((f, idx) => {
                             if (!f.content) return;
                             fileInstructions += `\n\n[FILE ${idx + 1}] Name: ${f.name}\n\n${f.content}`;
                         });
