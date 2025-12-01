@@ -221,14 +221,25 @@ You may want to audit/adjust the model IDs, tool configurations, and headers as 
 
 ### Extending with New Models/Providers
 
-To add a new LLM provider or model to the CypherLLM UI, follow the step‑by‑step recipe in [`ADD_MODEL_SYSTEM_PROMPT.md`](./ADD_MODEL_SYSTEM_PROMPT.md).  
-That document is written so that **either a human developer or an LLM** (acting as a code assistant) can mechanically apply all required changes across the codebase.
+To add a new LLM provider or model to the CypherLLM UI, follow the step‑by‑step recipe in [`ADD_MODEL_SYSTEM_PROMPT.md`](./ADD_MODEL_SYSTEM_PROMPT.md).
+
+That document:
+
+- Lists all the places in `index.html` that need to be updated (provider dropdown, model lists, API key storage, avatars, validation logic, etc.).
+- Includes example code snippets for each step (e.g., how to wire up a new provider’s API endpoint and headers).
+- Is written so that **either a human developer or an LLM** (acting as a code assistant) can mechanically apply all required changes without missing any of the scattered integration points.
+
+Use it whenever:
+
+- You want to add a brand‑new provider.
+- You want to add or rename models for an existing provider.
+- You need to update authentication, endpoints, or validation logic for a provider.
 
 ---
 
 ## Security Considerations
 
-- API keys are stored in plain text in `localStorage` and used directly in browser‐side `fetch` calls.
+- API keys are stored in plain text in `localStorage` and used directly in browser‑side `fetch` calls.
 - Anyone with access to your browser profile can potentially retrieve your keys.
 - Use this tool only on **trusted machines** and with **keys you are comfortable exposing to the browser**.
 
@@ -240,7 +251,7 @@ For production or shared environments, consider moving API calls to a backend se
 
 - **API errors**: Ensure your API key is valid (check the status indicator). Some models/tools may require specific beta access or billing enabled on your account.
 - **CORS issues**: Always run via a local HTTP server, not `file://`.
-- **File refresh not working**: After import or restart, re-attach files to enable the refresh feature (original File objects aren't persisted).
+- **File refresh not working**: After import or restart, re‑attach files to enable the refresh feature (original File objects aren't persisted).
 - **Performance**: Large conversations or attachments may slow down the browser due to `localStorage` limits (~5MB). Export and start new chats periodically.
 - **Browser compatibility**: Tested on Chrome 120+, Firefox 120+, Edge 120+. May not work on older browsers or Safari (due to `localStorage` and `fetch` behaviors).
 
