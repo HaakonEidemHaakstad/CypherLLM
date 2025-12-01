@@ -1177,6 +1177,15 @@
                 margin: 0 0 0.6em;
             }
 
+            .message-bubble img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin: 8px 0;
+                border: 1px solid var(--border-subtle);
+                display: block;
+            }
+
             .message-bubble.assistant p:last-child {
                 margin-bottom: 0;
             }
@@ -1850,7 +1859,6 @@
             <div id="main-content">
                 <header>
                     <div class="title">
-                        <div class="dot"></div>
                         <div style="position: relative; display: inline-block">
                             <div
                                 class="dot"
@@ -2293,6 +2301,41 @@
                     <div id="messages"></div>
                     <div id="settings-view">
                         <div id="settings-content">
+                            <div
+                                class="settings-section"
+                                style="
+                                    background: rgba(34, 197, 94, 0.1);
+                                    border: 1px solid rgba(34, 197, 94, 0.3);
+                                    border-radius: 8px;
+                                    padding: 12px;
+                                "
+                            >
+                                <label class="settings-label"
+                                    >Estimated Token Usage</label
+                                >
+                                <div
+                                    id="token-counter"
+                                    style="
+                                        font-size: 24px;
+                                        font-weight: 600;
+                                        color: var(--accent);
+                                        margin-top: 8px;
+                                    "
+                                >
+                                    Calculating...
+                                </div>
+                                <div
+                                    style="
+                                        font-size: 11px;
+                                        color: var(--text-muted);
+                                        margin-top: 4px;
+                                    "
+                                >
+                                    System prompt + pinned pairs + active
+                                    context pairs (~4 chars per token)
+                                </div>
+                            </div>
+
                             <div class="settings-section">
                                 <label class="settings-label"
                                     >System Prompt / Context</label
@@ -2453,11 +2496,13 @@
             const APIKEY_MISTRAL_VALID_KEY = "chat_clone_mistral_key_valid";
 
             const MODEL_LISTS = {
-                openai: ["gpt-5.1", "gpt-5.1-mini"],
+                openai: ["gpt-5.1", "gpt-5.1-mini", "gpt-image-1"],
                 google: [
                     "gemini-3-pro-preview",
                     "gemini-flash-latest",
                     "gemini-flash-lite-latest",
+                    "gemini-2.5-flash-image",
+                    "gemini-3-pro-image-preview",
                 ],
                 anthropic: [
                     "claude-opus-4-5-20251101",
@@ -2526,7 +2571,6 @@
             const stopBtn = document.getElementById("stop-btn");
             const statusDiv = document.getElementById("status");
             const headerStatusDiv = document.getElementById("header-status");
-            const statusDot = document.querySelector("header .dot");
             const statusDot = document.getElementById("status-dot");
             const statusLogDropdown = document.getElementById(
                 "status-log-dropdown",
@@ -2565,6 +2609,7 @@
             const settingsActiveList = document.getElementById(
                 "settings-active-list",
             );
+            const tokenCounter = document.getElementById("token-counter");
             const activePrevPageBtn =
                 document.getElementById("active-prev-page");
             const activeNextPageBtn =
@@ -2742,6 +2787,37 @@
                 }
             }
 
+            // ========= IMAGE HANDLING =========
+            // Strip images from text for storage (session-only display)
+            function stripImages(text) {
+                // Replace markdown images: ![alt](url) or ![alt](data:image...)
+                let stripped = text.replace(
+                    /!\[([^\]]*)\]\(([^)]+)\)/g,
+                    (match, alt, url) => {
+                        // Check if it's a data URL (base64) or regular URL
+                        if (url.startsWith("data:image")) {
+                            return `[Image: "${alt}" - not saved (base64 data)]`;
+                        } else {
+                            return `[Image: "${alt}" - URL expired: ${url}]`;
+                        }
+                    },
+                );
+
+                // Also handle HTML img tags if any
+                stripped = stripped.replace(
+                    /<img[^>]+src="([^"]*)"[^>]*alt="([^"]*)"[^>]*\/?>/gi,
+                    (match, src, alt) => {
+                        if (src.startsWith("data:image")) {
+                            return `[Image: "${alt}" - not saved (base64 data)]`;
+                        } else {
+                            return `[Image: "${alt}" - URL expired: ${src}]`;
+                        }
+                    },
+                );
+
+                return stripped;
+            }
+
             // ========= HISTORY LIMIT =========
             function loadHistoryLimit() {
                 const stored = localStorage.getItem(HISTORY_LIMIT_STORAGE_KEY);
@@ -2815,6 +2891,68 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
             function getChatName() {
                 return currentChatName;
+            }
+
+            // Calculate estimated token count for context
+            function updateTokenCounter() {
+                let totalChars = 0;
+
+                // Add system prompt
+                const systemPrompt = getContextPrompt();
+                if (systemPrompt) {
+                    totalChars += systemPrompt.length;
+                }
+
+                // Add file instructions if any
+                const includedFiles = attachedFiles.filter(
+                    (f) => f.include !== false,
+                );
+                if (includedFiles.length > 0) {
+                    includedFiles.forEach((f) => {
+                        if (f.content) {
+                            totalChars += f.content.length;
+                        }
+                    });
+                }
+
+                // Add pinned pairs
+                const pinnedPairs = conversationPairs.filter(
+                    (p) => p.pinned === true,
+                );
+                pinnedPairs.forEach((pair) => {
+                    totalChars += pair.user.length + pair.assistant.length;
+                });
+
+                // Add active context pairs (respecting history limit)
+                const includedPairs = conversationPairs.filter(
+                    (p) => p.include !== false && p.pinned !== true,
+                );
+                const recentPairs =
+                    HISTORY_LIMIT === 0
+                        ? includedPairs
+                        : includedPairs.slice(-HISTORY_LIMIT);
+
+                recentPairs.forEach((pair) => {
+                    totalChars += pair.user.length + pair.assistant.length;
+                });
+
+                // Estimate tokens (roughly 4 characters per token for English)
+                const estimatedTokens = Math.ceil(totalChars / 4);
+
+                // Format with commas
+                const formattedTokens = estimatedTokens.toLocaleString();
+
+                // Update display with color coding
+                tokenCounter.textContent = `~${formattedTokens} tokens`;
+
+                // Color code based on token count (typical limits: 128k, 200k)
+                if (estimatedTokens < 50000) {
+                    tokenCounter.style.color = "var(--accent)"; // Green
+                } else if (estimatedTokens < 100000) {
+                    tokenCounter.style.color = "#eab308"; // Yellow
+                } else {
+                    tokenCounter.style.color = "#ef4444"; // Red
+                }
             }
 
             // Update pinned pairs list in settings view
@@ -3083,6 +3221,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 codeBlocks.forEach((block) => {
                     hljs.highlightElement(block);
                 });
+
+                // Update token counter
+                updateTokenCounter();
             }
 
             // Update active context pairs list in settings view
@@ -3387,6 +3528,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 codeBlocks.forEach((block) => {
                     hljs.highlightElement(block);
                 });
+
+                // Update token counter
+                updateTokenCounter();
             }
 
             // Active context pagination
@@ -3426,6 +3570,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             settingsContextInput.addEventListener("input", () => {
                 currentContextPrompt = settingsContextInput.value;
                 localStorage.setItem(CONTEXT_STORAGE_KEY, currentContextPrompt);
+                updateTokenCounter();
             });
 
             // Handle history limit changes with +/- buttons
@@ -3666,22 +3811,28 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                 // Check if it's a GPT-5 model (which uses reasoning/verbosity, not temperature)
                 const isGPT5 = model && model.includes("gpt-5");
+                const isImageModel =
+                    model &&
+                    (model === "gpt-image-1" ||
+                        model === "gemini-2.5-flash-image" ||
+                        model === "gemini-3-pro-image-preview");
 
-                // Show/hide reasoning and verbosity controls for OpenAI (only GPT-5 models)
+                // Show/hide reasoning and verbosity controls for OpenAI (only GPT-5 models, not image models)
                 reasoningRow.style.display =
-                    isOpenAI && isGPT5 ? "flex" : "none";
+                    isOpenAI && isGPT5 && !isImageModel ? "flex" : "none";
                 verbosityRow.style.display =
-                    isOpenAI && isGPT5 ? "flex" : "none";
+                    isOpenAI && isGPT5 && !isImageModel ? "flex" : "none";
 
-                // Show temperature for Claude, Gemini, xAI, DeepSeek, and GPT-4 (but not GPT-5)
+                // Show temperature for Claude, Gemini, xAI, DeepSeek, and GPT-4 (but not GPT-5 or image models)
                 const showTemperature =
-                    provider === "anthropic" ||
-                    provider === "google" ||
-                    provider === "xai" ||
-                    provider === "deepseek" ||
-                    provider === "perplexity" ||
-                    provider === "mistral" ||
-                    (isOpenAI && !isGPT5);
+                    !isImageModel &&
+                    (provider === "anthropic" ||
+                        provider === "google" ||
+                        provider === "xai" ||
+                        provider === "deepseek" ||
+                        provider === "perplexity" ||
+                        provider === "mistral" ||
+                        (isOpenAI && !isGPT5));
                 temperatureRow.style.display = showTemperature
                     ? "flex"
                     : "none";
@@ -4805,8 +4956,14 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             // ========= LOCAL CONVERSATION STORAGE =========
             function saveConversationToLocal() {
                 try {
+                    // Strip images from assistant responses before saving
+                    const pairsToSave = conversationPairs.map((pair) => ({
+                        ...pair,
+                        assistant: stripImages(pair.assistant),
+                    }));
+
                     const data = {
-                        pairs: conversationPairs,
+                        pairs: pairsToSave,
                         attachments: attachedFiles,
                         chatName: currentChatName || "",
                     };
@@ -5627,6 +5784,12 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     return;
                 }
 
+                // Strip images from assistant responses before exporting
+                const pairsToExport = conversationPairs.map((pair) => ({
+                    ...pair,
+                    assistant: stripImages(pair.assistant),
+                }));
+
                 const data = {
                     version: 1,
                     exportedAt: new Date().toISOString(),
@@ -5634,7 +5797,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     model: modelSelect.value,
                     context: getContextPrompt(),
                     chatName: currentChatName || "",
-                    pairs: conversationPairs,
+                    pairs: pairsToExport,
                     attachments: attachedFiles,
                 };
 
@@ -5916,7 +6079,46 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     }
 
                     // --- OPENAI LOGIC (RESPONSES API) ---
-                    if (provider === "openai") {
+                    if (provider === "openai" && model === "gpt-image-1") {
+                        // Use Images API for gpt-image-1
+                        const requestBody = {
+                            model: "gpt-image-1",
+                            prompt: text,
+                            n: 1,
+                            size: "1024x1024", // Default size, can be made configurable
+                        };
+
+                        const response = await fetch(
+                            "https://api.openai.com/v1/images/generations",
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${apiKey}`,
+                                },
+                                body: JSON.stringify(requestBody),
+                                signal: currentAbortController.signal,
+                            },
+                        );
+
+                        if (!response.ok) {
+                            const errText = await response.text();
+                            throw new Error(
+                                `OpenAI Images API error: ${response.status} – ${errText}`,
+                            );
+                        }
+
+                        const data = await response.json();
+
+                        // Extract image URL and format as markdown
+                        const imageUrl = data.data?.[0]?.url;
+                        if (imageUrl) {
+                            assistantText = `![Generated image](${imageUrl})\n\n*Image generated with gpt-image-1*`;
+                        } else {
+                            assistantText =
+                                "Error: No image URL returned from API";
+                        }
+                    } else if (provider === "openai") {
                         const apiInput = [];
 
                         // Build context from system prompts and conversation history
@@ -6178,19 +6380,27 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         }
 
                         // Add tools for Gemini models
+                        // Check if it's an image model first
+                        const isImageModel =
+                            model === "gemini-2.5-flash-image" ||
+                            model === "gemini-3-pro-image-preview";
+
                         const tools = [];
 
-                        // Add Google Search grounding (works on stable models: gemini-3, gemini-2.5, gemini-2.0, gemini-1.5)
-                        if (
-                            model.includes("gemini-3") ||
-                            model.includes("gemini-2") ||
-                            model.includes("gemini-1")
-                        ) {
-                            tools.push({ google_search: {} });
-                        }
+                        // Only add tools for non-image models
+                        if (!isImageModel) {
+                            // Add Google Search grounding (works on stable models: gemini-3, gemini-2.5, gemini-2.0, gemini-1.5)
+                            if (
+                                model.includes("gemini-3") ||
+                                model.includes("gemini-2") ||
+                                model.includes("gemini-1")
+                            ) {
+                                tools.push({ google_search: {} });
+                            }
 
-                        // Add code execution tool (available on all Gemini models)
-                        tools.push({ code_execution: {} });
+                            // Add code execution tool (available on all non-image Gemini models)
+                            tools.push({ code_execution: {} });
+                        }
 
                         if (tools.length > 0) {
                             payload.tools = tools;
@@ -6202,6 +6412,16 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             payload.generationConfig = {
                                 temperature: temperature,
                             };
+                        }
+
+                        if (isImageModel) {
+                            // Enable image generation response
+                            payload.generationConfig =
+                                payload.generationConfig || {};
+                            payload.generationConfig.response_modalities = [
+                                "TEXT",
+                                "IMAGE",
+                            ];
                         }
 
                         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -6223,6 +6443,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         }
 
                         const data = await response.json();
+
                         // Google response structure
                         const candidates = data.candidates || [];
                         if (
@@ -6230,9 +6451,36 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             candidates[0].content &&
                             candidates[0].content.parts
                         ) {
-                            assistantText = candidates[0].content.parts
-                                .map((p) => p.text)
-                                .join("");
+                            // Handle both text and image parts
+                            const parts = candidates[0].content.parts;
+                            const textParts = [];
+
+                            parts.forEach((part) => {
+                                if (part.text) {
+                                    textParts.push(part.text);
+                                } else if (part.inlineData) {
+                                    // Image part - convert to markdown (camelCase)
+                                    const mimeType =
+                                        part.inlineData.mimeType || "image/png";
+                                    const base64Data = part.inlineData.data;
+                                    const dataUrl = `data:${mimeType};base64,${base64Data}`;
+                                    textParts.push(
+                                        `![Generated image](${dataUrl})`,
+                                    );
+                                } else if (part.inline_data) {
+                                    // Image part - convert to markdown (snake_case)
+                                    const mimeType =
+                                        part.inline_data.mime_type ||
+                                        "image/png";
+                                    const base64Data = part.inline_data.data;
+                                    const dataUrl = `data:${mimeType};base64,${base64Data}`;
+                                    textParts.push(
+                                        `![Generated image](${dataUrl})`,
+                                    );
+                                }
+                            });
+
+                            assistantText = textParts.join("\n\n");
                         } else {
                             assistantText = "(No content returned)";
                         }
