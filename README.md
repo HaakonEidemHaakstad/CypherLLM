@@ -1,7 +1,7 @@
 # CypherLLM
 
 CypherLLM is a single‑page, local, multi‑provider chat client for LLMs.  
-It runs entirely in your browser and talks directly to OpenAI, Google Gemini, Anthropic Claude, and xAI Grok using your own API keys.
+It runs entirely in your browser and talks directly to OpenAI, Google Gemini, Anthropic Claude, xAI Grok, DeepSeek, Perplexity, and Mistral using your own API keys.
 
 > No backend, no build step – just open `index.html` with a static server and start chatting.
 
@@ -14,6 +14,9 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
   - Google: `gemini-3-pro-preview`, `gemini-flash-latest`, `gemini-flash-lite-latest`
   - Anthropic: `claude-opus-4-5-20251101`, `claude-sonnet-4-5`, `claude-haiku-4-5`
   - xAI: `grok-4-latest`
+  - DeepSeek: `deepseek-chat`, `deepseek-reasoner`, `deepseek-coder`
+  - Perplexity: `sonar`, `sonar-pro`, `sonar-reasoning`, `sonar-deep-research`
+  - Mistral: `codestral-latest`, `mistral-large-latest`, `mistral-medium-latest`, `mistral-small-latest`
 - **Provider‑specific controls**
   - OpenAI GPT‑5: reasoning effort + verbosity controls
   - Other models: temperature control
@@ -96,7 +99,14 @@ in a modern browser (Chrome/Edge/Firefox).
 
 1. Choose a **Provider** (top‑right dropdown).
 2. Click the **key icon (🔑)**.
-3. Paste your API key (obtain from: [OpenAI](https://platform.openai.com/account/api-keys) | [Google AI Studio](https://aistudio.google.com/app/apikey) | [Anthropic](https://console.anthropic.com/settings/keys) | [xAI](https://console.x.ai/settings)).
+3. Paste your API key (obtain from:  
+   [OpenAI](https://platform.openai.com/account/api-keys) ·
+   [Google AI Studio](https://aistudio.google.com/app/apikey) ·
+   [Anthropic](https://console.anthropic.com/settings/keys) ·
+   [xAI](https://console.x.ai) ·
+   [DeepSeek](https://platform.deepseek.com) ·
+   [Perplexity](https://www.perplexity.ai/settings/api) ·
+   [Mistral](https://console.mistral.ai/))
 4. Click **Save** – the app will validate it against the provider.
 5. Repeat for other providers as needed.
 
@@ -200,6 +210,12 @@ Pinned pairs are always sent, regardless of the context limit.
   - **Anthropic**: `POST https://api.anthropic.com/v1/messages`  
     - Uses beta tool APIs (`web_search`, `computer`, `bash`, `text_editor`) with appropriate headers.
   - **xAI**: `POST https://api.x.ai/v1/chat/completions`.
+  - **DeepSeek**: `POST https://api.deepseek.com/v1/chat/completions`  
+    - OpenAI‑compatible Chat Completions format.
+  - **Perplexity**: `POST https://api.perplexity.ai/chat/completions`  
+    - OpenAI‑compatible Chat Completions format (Sonar models with web‑grounded answers).
+  - **Mistral**: `POST https://api.mistral.ai/v1/chat/completions`  
+    - OpenAI‑compatible Chat Completions format.
 
 You may want to audit/adjust the model IDs, tool configurations, and headers as providers evolve.
 
