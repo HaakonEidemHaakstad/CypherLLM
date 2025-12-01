@@ -369,7 +369,7 @@
                 border: 1px solid var(--border-subtle);
                 background: #020617;
                 color: var(--text-muted);
-                font-size: 11px;
+                font-size: 12px;
                 cursor: pointer;
                 text-decoration: none;
                 display: inline-flex;
@@ -426,12 +426,13 @@
                 border: 1px solid var(--border-subtle);
                 background: #020617;
                 color: var(--text-muted);
-                font-size: 11px;
+                font-size: 12px;
                 cursor: pointer;
                 display: inline-flex;
                 align-items: center;
                 gap: 4px;
                 position: relative;
+                vertical-align: middle;
             }
 
             .api-key-btn:hover {
@@ -456,6 +457,67 @@
 
             .api-key-status.valid-key {
                 color: #22c55e;
+            }
+
+            /* Model settings button */
+            .model-settings-btn {
+                padding: 3px 10px;
+                border-radius: 999px;
+                border: 1px solid var(--border-subtle);
+                background: #020617;
+                color: var(--text-muted);
+                font-size: 12px;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                position: relative;
+                vertical-align: middle;
+            }
+
+            .model-settings-btn:hover {
+                border-color: #4b5563;
+                color: #e5e7eb;
+                background: #0a0f1f;
+            }
+
+            .model-settings-btn.active {
+                border-color: #3b82f6;
+                color: #3b82f6;
+                background: rgba(59, 130, 246, 0.1);
+            }
+
+            /* Model settings dropdown */
+            .model-settings-dropdown {
+                display: none;
+                position: absolute;
+                top: calc(100% + 4px);
+                right: 0;
+                background: linear-gradient(145deg, #0a0f1f, #020617 40%);
+                border: 1px solid var(--border-subtle);
+                border-radius: 8px;
+                padding: 12px;
+                z-index: 50;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
+                min-width: 200px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .model-settings-dropdown.visible {
+                display: flex;
+            }
+
+            .model-settings-row {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .model-settings-label {
+                font-size: 11px;
+                color: var(--text-muted);
+                font-weight: 600;
             }
 
             /* Modal */
@@ -665,7 +727,7 @@
             #pagination {
                 display: flex;
                 flex-direction: column;
-                font-size: 12px;
+                font-size: 11px;
                 color: var(--text-muted);
                 border-bottom: 1px solid var(--border-subtle);
                 background: rgba(15, 23, 42, 0.8);
@@ -698,7 +760,7 @@
                 border: 1px solid var(--border-subtle);
                 background: #020617;
                 color: var(--text-main);
-                font-size: 12px;
+                font-size: 11px;
                 cursor: pointer;
                 display: inline-flex;
                 align-items: center;
@@ -963,6 +1025,21 @@
             .avatar.assistant.xai {
                 background: #000000;
                 border: 1px solid #333333;
+                color: #ffffff;
+            }
+
+            .avatar.assistant.deepseek {
+                background: #1e3a8a;
+                color: #ffffff;
+            }
+
+            .avatar.assistant.perplexity {
+                background: #1fb6ff;
+                color: #ffffff;
+            }
+
+            .avatar.assistant.mistral {
+                background: #ff7000;
                 color: #ffffff;
             }
 
@@ -1376,11 +1453,11 @@
                 padding: 2px 8px;
                 background: transparent;
                 color: var(--text-main);
-                font-size: 14px;
+                font-size: 12px;
                 font-weight: 600;
                 cursor: pointer;
                 min-width: 24px;
-                height: 24px;
+                height: 15;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
@@ -1693,6 +1770,9 @@
                                 <option value="google">Google</option>
                                 <option value="anthropic">Anthropic</option>
                                 <option value="xai">xAI</option>
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="perplexity">Perplexity</option>
+                                <option value="mistral">Mistral</option>
                             </select>
                         </div>
                         <div class="select-wrapper">
@@ -1702,65 +1782,127 @@
                             </select>
                         </div>
                         <div
-                            class="select-wrapper"
-                            id="reasoning-wrapper"
-                            style="display: none"
+                            style="
+                                position: relative;
+                                display: inline-block;
+                                vertical-align: middle;
+                                margin-bottom: 1px;
+                            "
                         >
-                            <span class="label-text">Reasoning:</span>
-                            <select id="reasoning-select">
-                                <option value="none">None</option>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-                        <div
-                            class="select-wrapper"
-                            id="verbosity-wrapper"
-                            style="display: none"
-                        >
-                            <span class="label-text">Verbosity:</span>
-                            <select id="verbosity-select">
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-                        <div
-                            class="select-wrapper"
-                            id="temperature-wrapper"
-                            style="display: none"
-                        >
-                            <span class="label-text">Temperature:</span>
-                            <input
-                                type="number"
-                                id="temperature-input"
-                                min="0"
-                                max="2"
-                                step="0.1"
-                                value="1.0"
-                                style="
-                                    width: 60px;
-                                    text-align: center;
-                                    font-size: 12px;
-                                    color: var(--text-main);
-                                    background: #020617;
-                                    border: 1px solid var(--border-subtle);
-                                    border-radius: 4px;
-                                    padding: 4px 8px;
-                                "
-                            />
-                        </div>
-                        <button
-                            id="api-key-btn"
-                            class="api-key-btn"
-                            title="Set API Key"
-                        >
-                            <span class="api-key-icon">🔑</span>
-                            <span id="api-key-status" class="api-key-status"
-                                >●</span
+                            <button
+                                id="model-settings-btn"
+                                class="model-settings-btn"
+                                title="Model Settings"
                             >
-                        </button>
+                                ⚙
+                            </button>
+                            <div
+                                id="model-settings-dropdown"
+                                class="model-settings-dropdown"
+                            >
+                                <div
+                                    class="model-settings-row"
+                                    id="reasoning-row"
+                                    style="display: none"
+                                >
+                                    <span class="model-settings-label"
+                                        >Reasoning Effort:</span
+                                    >
+                                    <select
+                                        id="reasoning-select-new"
+                                        style="
+                                            padding: 4px 8px;
+                                            background: #020617;
+                                            color: var(--text-main);
+                                            border: 1px solid
+                                                var(--border-subtle);
+                                            border-radius: 4px;
+                                            font-size: 12px;
+                                            outline: none;
+                                        "
+                                    >
+                                        <option value="none">None</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                                <div
+                                    class="model-settings-row"
+                                    id="verbosity-row"
+                                    style="display: none"
+                                >
+                                    <span class="model-settings-label"
+                                        >Verbosity:</span
+                                    >
+                                    <select
+                                        id="verbosity-select-new"
+                                        style="
+                                            padding: 4px 8px;
+                                            background: #020617;
+                                            color: var(--text-main);
+                                            border: 1px solid
+                                                var(--border-subtle);
+                                            border-radius: 4px;
+                                            font-size: 12px;
+                                            outline: none;
+                                        "
+                                    >
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                                <div
+                                    class="model-settings-row"
+                                    id="temperature-row"
+                                    style="display: none"
+                                >
+                                    <span class="model-settings-label"
+                                        >Temperature:</span
+                                    >
+                                    <input
+                                        type="number"
+                                        id="temperature-input-new"
+                                        min="0"
+                                        max="2"
+                                        step="0.1"
+                                        value="1.0"
+                                        style="
+                                            width: 100%;
+                                            text-align: center;
+                                            font-size: 12px;
+                                            color: var(--text-main);
+                                            background: #020617;
+                                            border: 1px solid
+                                                var(--border-subtle);
+                                            border-radius: 4px;
+                                            padding: 4px 8px;
+                                            outline: none;
+                                        "
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            style="
+                                position: relative;
+                                display: inline-block;
+                                vertical-align: middle;
+                                margin-bottom: 1px;
+                            "
+                        >
+                            <button
+                                id="api-key-btn"
+                                class="api-key-btn"
+                                title="Set API Key"
+                            >
+                                <span class="api-key-icon">🔑</span>
+                                <span id="api-key-status" class="api-key-status"
+                                    >●</span
+                                >
+                            </button>
+                        </div>
                         <a
                             id="api-link-btn"
                             href="#"
@@ -1849,6 +1991,7 @@
                                         color: var(--text-muted);
                                         margin-left: 8px;
                                     "
+                                    title="Number of conversation pairs to display per page (0 = unlimited)"
                                     >Per page:</span
                                 >
                                 <div
@@ -1870,18 +2013,19 @@
                                     <input
                                         type="number"
                                         id="page-size-display"
-                                        min="1"
+                                        min="0"
                                         max="100"
                                         style="
-                                            width: 45px;
+                                            width: 25px;
                                             text-align: center;
                                             font-size: 12px;
                                             color: var(--text-main);
                                             background: transparent;
                                             border: none;
-                                            padding: 2px 4px;
+                                            padding: 1px 4px;
                                             outline: none;
                                         "
+                                        title="Number of conversation pairs to display per page (0 = unlimited)"
                                         value="10"
                                     />
                                     <button
@@ -1898,6 +2042,7 @@
                                         color: var(--text-muted);
                                         margin-left: 8px;
                                     "
+                                    title="Maximum number of recent conversation pairs to include in context (0 = unlimited)"
                                     >Context limit:</span
                                 >
                                 <div
@@ -1922,15 +2067,16 @@
                                         min="0"
                                         max="50"
                                         style="
-                                            width: 45px;
+                                            width: 25px;
                                             text-align: center;
                                             font-size: 12px;
                                             color: var(--text-main);
                                             background: transparent;
                                             border: none;
-                                            padding: 2px 4px;
+                                            padding: 1px 4px;
                                             outline: none;
                                         "
+                                        title="Maximum number of recent conversation pairs to include in context (0 = unlimited)"
                                         value="12"
                                     />
                                     <button
@@ -2117,6 +2263,10 @@
             const ASSISTANT_AVATAR_ANTHROPIC_KEY =
                 "chat_clone_avatar_anthropic";
             const ASSISTANT_AVATAR_XAI_KEY = "chat_clone_avatar_xai";
+            const ASSISTANT_AVATAR_DEEPSEEK_KEY = "chat_clone_avatar_deepseek";
+            const ASSISTANT_AVATAR_PERPLEXITY_KEY =
+                "chat_clone_avatar_perplexity";
+            const ASSISTANT_AVATAR_MISTRAL_KEY = "chat_clone_avatar_mistral";
             const EXPORT_FILENAME_PREFIX = "chat_conversation";
             const CONVO_STORAGE_KEY = "chat_clone_conversation";
 
@@ -2129,11 +2279,19 @@
             const APIKEY_GOOGLE_STORAGE_KEY = "chat_clone_google_api_key";
             const APIKEY_ANTHROPIC_STORAGE_KEY = "chat_clone_anthropic_api_key";
             const APIKEY_XAI_STORAGE_KEY = "chat_clone_xai_api_key";
+            const APIKEY_DEEPSEEK_STORAGE_KEY = "chat_clone_deepseek_api_key";
+            const APIKEY_PERPLEXITY_STORAGE_KEY =
+                "chat_clone_perplexity_api_key";
+            const APIKEY_MISTRAL_STORAGE_KEY = "chat_clone_mistral_api_key";
 
             const APIKEY_OPENAI_VALID_KEY = "chat_clone_openai_key_valid";
             const APIKEY_GOOGLE_VALID_KEY = "chat_clone_google_key_valid";
             const APIKEY_ANTHROPIC_VALID_KEY = "chat_clone_anthropic_key_valid";
             const APIKEY_XAI_VALID_KEY = "chat_clone_xai_key_valid";
+            const APIKEY_DEEPSEEK_VALID_KEY = "chat_clone_deepseek_key_valid";
+            const APIKEY_PERPLEXITY_VALID_KEY =
+                "chat_clone_perplexity_key_valid";
+            const APIKEY_MISTRAL_VALID_KEY = "chat_clone_mistral_key_valid";
 
             const MODEL_LISTS = {
                 openai: ["gpt-5.1", "gpt-5.1-mini"],
@@ -2148,6 +2306,23 @@
                     "claude-haiku-4-5",
                 ],
                 xai: ["grok-4-latest"],
+                deepseek: [
+                    "deepseek-chat",
+                    "deepseek-reasoner",
+                    "deepseek-coder",
+                ],
+                perplexity: [
+                    "sonar",
+                    "sonar-pro",
+                    "sonar-reasoning",
+                    "sonar-deep-research",
+                ],
+                mistral: [
+                    "codestral-latest",
+                    "mistral-large-latest",
+                    "mistral-medium-latest",
+                    "mistral-small-latest",
+                ],
             };
 
             const PROVIDER_LOGOS = {
@@ -2155,6 +2330,7 @@
                 google: `<svg viewBox="0 0 24 24" fill="currentColor" height="60%" width="60%"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#FFFFFF"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#FFFFFF"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.84z" fill="#FFFFFF"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#FFFFFF"/></svg>`,
                 anthropic: `<svg viewBox="0 0 24 24" fill="currentColor" height="65%" width="65%"><path d="M17.85 20.48L15.93 15h-7.85l-1.93 5.48H2.12L10.05 0h3.91l7.93 20.48h-4.04zM12 4.4L8.76 12.65h6.5L12 4.4z"/></svg>`,
                 xai: `<svg viewBox="0 0 24 24" fill="currentColor" height="60%" width="60%"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>`,
+                deepseek: `<svg viewBox="0 0 24 24" fill="currentColor" height="60%" width="60%"><text x="50%" y="75%" text-anchor="middle" font-size="20" font-weight="bold">D</text></svg>`,
             };
 
             // ========= STATE =========
@@ -2168,6 +2344,9 @@
                 google: "",
                 anthropic: "",
                 xai: "",
+                deepseek: "",
+                perplexity: "",
+                mistral: "",
             };
 
             // User avatar state
@@ -2179,6 +2358,7 @@
                 google: null,
                 anthropic: null,
                 xai: null,
+                deepseek: null,
             };
 
             const messagesDiv = document.getElementById("messages");
@@ -2236,17 +2416,23 @@
             const modalClearBtn = document.getElementById("modal-clear-btn");
             const providerSelect = document.getElementById("provider-select");
             const modelSelect = document.getElementById("model-select");
-            const reasoningSelect = document.getElementById("reasoning-select");
-            const verbositySelect = document.getElementById("verbosity-select");
-            const reasoningWrapper =
-                document.getElementById("reasoning-wrapper");
-            const verbosityWrapper =
-                document.getElementById("verbosity-wrapper");
-            const temperatureInput =
-                document.getElementById("temperature-input");
-            const temperatureWrapper = document.getElementById(
-                "temperature-wrapper",
+            const modelSettingsBtn =
+                document.getElementById("model-settings-btn");
+            const modelSettingsDropdown = document.getElementById(
+                "model-settings-dropdown",
             );
+            const reasoningSelect = document.getElementById(
+                "reasoning-select-new",
+            );
+            const verbositySelect = document.getElementById(
+                "verbosity-select-new",
+            );
+            const reasoningRow = document.getElementById("reasoning-row");
+            const verbosityRow = document.getElementById("verbosity-row");
+            const temperatureInput = document.getElementById(
+                "temperature-input-new",
+            );
+            const temperatureRow = document.getElementById("temperature-row");
             const apiLinkBtn = document.getElementById("api-link-btn");
             const newChatBtn = document.getElementById("new-chat-btn");
             const exportBtn = document.getElementById("export-btn");
@@ -2697,23 +2883,37 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                 // Calculate pagination
                 const totalPairs = limitedPairs.length;
-                const totalPages = Math.ceil(totalPairs / PAGE_SIZE);
-                if (activeContextPage > totalPages)
-                    activeContextPage = totalPages;
-                if (activeContextPage < 1) activeContextPage = 1;
+                let pagePairs;
 
-                // Get pairs for current page (from end, like main chat view)
-                const startIndex = Math.max(
-                    0,
-                    totalPairs - activeContextPage * PAGE_SIZE,
-                );
-                const endIndex = Math.min(totalPairs, startIndex + PAGE_SIZE);
-                const pagePairs = limitedPairs.slice(startIndex, endIndex);
+                if (PAGE_SIZE === 0) {
+                    // PAGE_SIZE = 0 means unlimited, show all pairs
+                    pagePairs = limitedPairs;
+                    activePageInfo.textContent = "All pairs";
+                    activePrevPageBtn.disabled = true;
+                    activeNextPageBtn.disabled = true;
+                } else {
+                    const totalPages = Math.ceil(totalPairs / PAGE_SIZE);
+                    if (activeContextPage > totalPages)
+                        activeContextPage = totalPages;
+                    if (activeContextPage < 1) activeContextPage = 1;
 
-                // Update page info
-                activePageInfo.textContent = `Page ${activeContextPage} / ${totalPages}`;
-                activePrevPageBtn.disabled = activeContextPage >= totalPages;
-                activeNextPageBtn.disabled = activeContextPage <= 1;
+                    // Get pairs for current page (from end, like main chat view)
+                    const startIndex = Math.max(
+                        0,
+                        totalPairs - activeContextPage * PAGE_SIZE,
+                    );
+                    const endIndex = Math.min(
+                        totalPairs,
+                        startIndex + PAGE_SIZE,
+                    );
+                    pagePairs = limitedPairs.slice(startIndex, endIndex);
+
+                    // Update page info
+                    activePageInfo.textContent = `Page ${activeContextPage} / ${totalPages}`;
+                    activePrevPageBtn.disabled =
+                        activeContextPage >= totalPages;
+                    activeNextPageBtn.disabled = activeContextPage <= 1;
+                }
 
                 // Display summary info
                 const summaryDiv = document.createElement("div");
@@ -3056,7 +3256,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             // Handle direct input for page size
             pageSizeDisplay.addEventListener("input", () => {
                 const value = parseInt(pageSizeDisplay.value, 10);
-                if (!isNaN(value) && value >= 1 && value <= 100) {
+                if (!isNaN(value) && value >= 0 && value <= 100) {
                     PAGE_SIZE = value;
                     localStorage.setItem(
                         PAGE_SIZE_STORAGE_KEY,
@@ -3064,10 +3264,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     );
                     currentPage = 1;
                     renderPage();
-                    updateStatus(
-                        `Page size set to ${PAGE_SIZE} pair(s).`,
-                        "success",
-                    );
+                    const sizeText =
+                        value === 0 ? "unlimited" : `${value} pair(s)`;
+                    updateStatus(`Page size set to ${sizeText}.`, "success");
                 }
             });
 
@@ -3117,10 +3316,18 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 const gKey = localStorage.getItem(APIKEY_GOOGLE_STORAGE_KEY);
                 const aKey = localStorage.getItem(APIKEY_ANTHROPIC_STORAGE_KEY);
                 const xKey = localStorage.getItem(APIKEY_XAI_STORAGE_KEY);
+                const dKey = localStorage.getItem(APIKEY_DEEPSEEK_STORAGE_KEY);
+                const pKey = localStorage.getItem(
+                    APIKEY_PERPLEXITY_STORAGE_KEY,
+                );
+                const mKey = localStorage.getItem(APIKEY_MISTRAL_STORAGE_KEY);
                 if (oaKey) apiKeys.openai = oaKey;
                 if (gKey) apiKeys.google = gKey;
                 if (aKey) apiKeys.anthropic = aKey;
                 if (xKey) apiKeys.xai = xKey;
+                if (dKey) apiKeys.deepseek = dKey;
+                if (pKey) apiKeys.perplexity = pKey;
+                if (mKey) apiKeys.mistral = mKey;
             }
 
             function loadProviderAndModel() {
@@ -3133,6 +3340,8 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         savedProvider === "google" ||
                         savedProvider === "anthropic" ||
                         savedProvider === "xai")
+                        savedProvider === "xai" ||
+                        savedProvider === "deepseek")
                 ) {
                     providerSelect.value = savedProvider;
                 } else {
@@ -3216,6 +3425,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     google: "https://aistudio.google.com/u/1/usage?pli=1&timeRange=last-28-days&project=gen-lang-client-0347389595&tab=billing",
                     anthropic: "https://console.anthropic.com/settings/billing",
                     xai: "https://console.x.ai/",
+                    deepseek: "https://platform.deepseek.com/usage",
+                    perplexity: "https://www.perplexity.ai/settings/api",
+                    mistral: "https://console.mistral.ai/",
                 };
                 apiLinkBtn.href = apiLinks[provider] || "#";
             }
@@ -3229,21 +3441,70 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 const isGPT5 = model && model.includes("gpt-5");
 
                 // Show/hide reasoning and verbosity controls for OpenAI (only GPT-5 models)
-                reasoningWrapper.style.display =
-                    isOpenAI && isGPT5 ? "" : "none";
-                verbosityWrapper.style.display =
-                    isOpenAI && isGPT5 ? "" : "none";
+                reasoningRow.style.display =
+                    isOpenAI && isGPT5 ? "flex" : "none";
+                verbosityRow.style.display =
+                    isOpenAI && isGPT5 ? "flex" : "none";
 
                 // Show temperature for Claude, Gemini, xAI, and GPT-4 (but not GPT-5)
+                // Show temperature for Claude, Gemini, xAI, DeepSeek, and GPT-4 (but not GPT-5)
                 const showTemperature =
                     provider === "anthropic" ||
                     provider === "google" ||
                     provider === "xai" ||
+                    provider === "deepseek" ||
+                    provider === "perplexity" ||
+                    provider === "mistral" ||
                     (isOpenAI && !isGPT5);
-                temperatureWrapper.style.display = showTemperature
-                    ? ""
+                temperatureRow.style.display = showTemperature
+                    ? "flex"
+                    : "none";
+
+                // Set temperature limits based on provider
+                if (provider === "anthropic") {
+                    // Anthropic: 0-1
+                    temperatureInput.max = "1";
+                    temperatureInput.step = "0.1";
+                    if (parseFloat(temperatureInput.value) > 1) {
+                        temperatureInput.value = "1.0";
+                    }
+                } else {
+                    // OpenAI, Google, xAI: 0-2
+                    temperatureInput.max = "2";
+                    temperatureInput.step = "0.1";
+                }
+
+                // Show/hide the settings button based on whether any settings are available
+                const hasSettings = (isOpenAI && isGPT5) || showTemperature;
+                modelSettingsBtn.style.display = hasSettings
+                    ? "inline-flex"
                     : "none";
             }
+
+            // Toggle model settings dropdown
+            modelSettingsBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const isVisible =
+                    modelSettingsDropdown.classList.contains("visible");
+                if (isVisible) {
+                    modelSettingsDropdown.classList.remove("visible");
+                    modelSettingsBtn.classList.remove("active");
+                } else {
+                    modelSettingsDropdown.classList.add("visible");
+                    modelSettingsBtn.classList.add("active");
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener("click", (e) => {
+                if (
+                    !modelSettingsBtn.contains(e.target) &&
+                    !modelSettingsDropdown.contains(e.target)
+                ) {
+                    modelSettingsDropdown.classList.remove("visible");
+                    modelSettingsBtn.classList.remove("active");
+                }
+            });
 
             providerSelect.addEventListener("change", (e) => {
                 const newProvider = e.target.value;
@@ -3369,6 +3630,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     google: ASSISTANT_AVATAR_GOOGLE_KEY,
                     anthropic: ASSISTANT_AVATAR_ANTHROPIC_KEY,
                     xai: ASSISTANT_AVATAR_XAI_KEY,
+                    deepseek: ASSISTANT_AVATAR_DEEPSEEK_KEY,
+                    perplexity: ASSISTANT_AVATAR_PERPLEXITY_KEY,
+                    mistral: ASSISTANT_AVATAR_MISTRAL_KEY,
                 };
 
                 for (const provider in storageKeys) {
@@ -3386,6 +3650,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     google: ASSISTANT_AVATAR_GOOGLE_KEY,
                     anthropic: ASSISTANT_AVATAR_ANTHROPIC_KEY,
                     xai: ASSISTANT_AVATAR_XAI_KEY,
+                    deepseek: ASSISTANT_AVATAR_DEEPSEEK_KEY,
+                    perplexity: ASSISTANT_AVATAR_PERPLEXITY_KEY,
+                    mistral: ASSISTANT_AVATAR_MISTRAL_KEY,
                 };
                 localStorage.setItem(storageKeys[provider], dataUrl);
 
@@ -3394,6 +3661,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     google: "Google",
                     anthropic: "Anthropic",
                     xai: "xAI",
+                    deepseek: "DeepSeek",
+                    perplexity: "Perplexity",
+                    mistral: "Mistral",
                 };
                 updateStatus(
                     `${providerNames[provider]} avatar updated`,
@@ -3438,6 +3708,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         google: APIKEY_GOOGLE_VALID_KEY,
                         anthropic: APIKEY_ANTHROPIC_VALID_KEY,
                         xai: APIKEY_XAI_VALID_KEY,
+                        deepseek: APIKEY_DEEPSEEK_VALID_KEY,
+                        perplexity: APIKEY_PERPLEXITY_VALID_KEY,
+                        mistral: APIKEY_MISTRAL_VALID_KEY,
                     };
 
                     const isValid =
@@ -3461,6 +3734,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     google: "Google",
                     anthropic: "Anthropic",
                     xai: "xAI",
+                    deepseek: "DeepSeek",
+                    perplexity: "Perplexity",
+                    mistral: "Mistral",
                 };
 
                 modalProviderName.textContent =
@@ -3516,6 +3792,27 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             break;
                         case "xai":
                             endpoint = "https://api.x.ai/v1/models";
+                            headers = { Authorization: `Bearer ${key}` };
+                            break;
+                        case "deepseek":
+                            endpoint = "https://api.deepseek.com/v1/models";
+                            headers = { Authorization: `Bearer ${key}` };
+                            break;
+                        case "perplexity":
+                            endpoint =
+                                "https://api.perplexity.ai/chat/completions";
+                            method = "POST";
+                            headers = {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${key}`,
+                            };
+                            body = JSON.stringify({
+                                model: "sonar",
+                                messages: [{ role: "user", content: "test" }],
+                            });
+                            break;
+                        case "mistral":
+                            endpoint = "https://api.mistral.ai/v1/models";
                             headers = { Authorization: `Bearer ${key}` };
                             break;
                     }
@@ -3599,12 +3896,18 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             google: APIKEY_GOOGLE_STORAGE_KEY,
                             anthropic: APIKEY_ANTHROPIC_STORAGE_KEY,
                             xai: APIKEY_XAI_STORAGE_KEY,
+                            deepseek: APIKEY_DEEPSEEK_STORAGE_KEY,
+                            perplexity: APIKEY_PERPLEXITY_STORAGE_KEY,
+                            mistral: APIKEY_MISTRAL_STORAGE_KEY,
                         };
                         const validationKeys = {
                             openai: APIKEY_OPENAI_VALID_KEY,
                             google: APIKEY_GOOGLE_VALID_KEY,
                             anthropic: APIKEY_ANTHROPIC_VALID_KEY,
                             xai: APIKEY_XAI_VALID_KEY,
+                            deepseek: APIKEY_DEEPSEEK_VALID_KEY,
+                            perplexity: APIKEY_PERPLEXITY_VALID_KEY,
+                            mistral: APIKEY_MISTRAL_VALID_KEY,
                         };
 
                         localStorage.setItem(storageKeys[provider], key);
@@ -3641,12 +3944,18 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     google: APIKEY_GOOGLE_STORAGE_KEY,
                     anthropic: APIKEY_ANTHROPIC_STORAGE_KEY,
                     xai: APIKEY_XAI_STORAGE_KEY,
+                    deepseek: APIKEY_DEEPSEEK_STORAGE_KEY,
+                    perplexity: APIKEY_PERPLEXITY_STORAGE_KEY,
+                    mistral: APIKEY_MISTRAL_STORAGE_KEY,
                 };
                 const validationKeys = {
                     openai: APIKEY_OPENAI_VALID_KEY,
                     google: APIKEY_GOOGLE_VALID_KEY,
                     anthropic: APIKEY_ANTHROPIC_VALID_KEY,
                     xai: APIKEY_XAI_VALID_KEY,
+                    deepseek: APIKEY_DEEPSEEK_VALID_KEY,
+                    perplexity: APIKEY_PERPLEXITY_VALID_KEY,
+                    mistral: APIKEY_MISTRAL_VALID_KEY,
                 };
 
                 localStorage.removeItem(storageKeys[provider]);
@@ -3660,11 +3969,23 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             // Validate all stored API keys on startup
             async function validateAllKeys() {
                 const providers = ["openai", "google", "anthropic", "xai"];
+                const providers = [
+                    "openai",
+                    "google",
+                    "anthropic",
+                    "xai",
+                    "deepseek",
+                    "perplexity",
+                    "mistral",
+                ];
                 const validationKeys = {
                     openai: APIKEY_OPENAI_VALID_KEY,
                     google: APIKEY_GOOGLE_VALID_KEY,
                     anthropic: APIKEY_ANTHROPIC_VALID_KEY,
                     xai: APIKEY_XAI_VALID_KEY,
+                    deepseek: APIKEY_DEEPSEEK_VALID_KEY,
+                    perplexity: APIKEY_PERPLEXITY_VALID_KEY,
+                    mistral: APIKEY_MISTRAL_VALID_KEY,
                 };
 
                 const providerNames = {
@@ -3672,6 +3993,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     google: "Google",
                     anthropic: "Anthropic",
                     xai: "xAI",
+                    deepseek: "DeepSeek",
+                    perplexity: "Perplexity",
+                    mistral: "Mistral",
                 };
 
                 let validatedCount = 0;
@@ -3782,6 +4106,27 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             break;
                         case "xai":
                             endpoint = "https://api.x.ai/v1/models";
+                            headers = { Authorization: `Bearer ${key}` };
+                            break;
+                        case "deepseek":
+                            endpoint = "https://api.deepseek.com/v1/models";
+                            headers = { Authorization: `Bearer ${key}` };
+                            break;
+                        case "perplexity":
+                            endpoint =
+                                "https://api.perplexity.ai/chat/completions";
+                            method = "POST";
+                            headers = {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${key}`,
+                            };
+                            body = JSON.stringify({
+                                model: "sonar",
+                                messages: [{ role: "user", content: "test" }],
+                            });
+                            break;
+                        case "mistral":
+                            endpoint = "https://api.mistral.ai/v1/models";
                             headers = { Authorization: `Bearer ${key}` };
                             break;
                     }
@@ -5397,11 +5742,11 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         }
 
                         // Add tools for Gemini models
-                        // Note: google_search may not be supported on preview models like gemini-3-pro-preview
                         const tools = [];
 
-                        // Add Google Search grounding (works on stable models: gemini-2.5, gemini-2.0, gemini-1.5)
+                        // Add Google Search grounding (works on stable models: gemini-3, gemini-2.5, gemini-2.0, gemini-1.5)
                         if (
+                            model.includes("gemini-3") ||
                             model.includes("gemini-2") ||
                             model.includes("gemini-1")
                         ) {
@@ -5672,6 +6017,285 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         } else {
                             assistantText = "(No content returned)";
                         }
+                    } else if (provider === "deepseek") {
+                        const apiMessages = [];
+
+                        // Get pinned pairs (always included)
+                        const pinnedPairs = conversationPairs.filter(
+                            (p) => p.pinned === true,
+                        );
+
+                        // Get regular included pairs (excluding pinned ones)
+                        const includedPairs = conversationPairs.filter(
+                            (p) => p.include !== false && p.pinned !== true,
+                        );
+                        const recentPairs =
+                            HISTORY_LIMIT === 0
+                                ? includedPairs
+                                : includedPairs.slice(-HISTORY_LIMIT);
+
+                        // Add pinned pairs first
+                        pinnedPairs.forEach((pair) => {
+                            apiMessages.push({
+                                role: "user",
+                                content: pair.user,
+                            });
+                            apiMessages.push({
+                                role: "assistant",
+                                content: pair.assistant,
+                            });
+                        });
+
+                        // Then add recent pairs
+                        recentPairs.forEach((pair) => {
+                            apiMessages.push({
+                                role: "user",
+                                content: pair.user,
+                            });
+                            apiMessages.push({
+                                role: "assistant",
+                                content: pair.assistant,
+                            });
+                        });
+
+                        apiMessages.push({ role: "user", content: text });
+
+                        // Construct system prompt
+                        let fullSystemPrompt = context || "";
+                        if (fileInstructions) {
+                            fullSystemPrompt += "\n\n" + fileInstructions;
+                        }
+
+                        if (fullSystemPrompt.trim()) {
+                            apiMessages.unshift({
+                                role: "system",
+                                content: fullSystemPrompt,
+                            });
+                        }
+
+                        const payload = {
+                            model: model,
+                            messages: apiMessages,
+                        };
+
+                        // Add temperature parameter
+                        const temperature = parseFloat(temperatureInput.value);
+                        if (!isNaN(temperature)) {
+                            payload.temperature = temperature;
+                        }
+
+                        const headers = {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${apiKey}`,
+                        };
+
+                        const response = await fetch(
+                            "https://api.deepseek.com/v1/chat/completions",
+                            {
+                                method: "POST",
+                                headers: headers,
+                                body: JSON.stringify(payload),
+                            },
+                        );
+
+                        if (!response.ok) {
+                            const errText = await response.text();
+                            throw new Error(
+                                `DeepSeek API error: ${response.status} – ${errText}`,
+                            );
+                        }
+
+                        const data = await response.json();
+                        // OpenAI-compatible response structure
+                        assistantText =
+                            data.choices[0]?.message?.content ||
+                            "(No content returned)";
+                    } else if (provider === "perplexity") {
+                        const apiMessages = [];
+
+                        // Get pinned pairs (always included)
+                        const pinnedPairs = conversationPairs.filter(
+                            (p) => p.pinned === true,
+                        );
+
+                        // Get regular included pairs (excluding pinned ones)
+                        const includedPairs = conversationPairs.filter(
+                            (p) => p.include !== false && p.pinned !== true,
+                        );
+                        const recentPairs =
+                            HISTORY_LIMIT === 0
+                                ? includedPairs
+                                : includedPairs.slice(-HISTORY_LIMIT);
+
+                        // Add pinned pairs first
+                        pinnedPairs.forEach((pair) => {
+                            apiMessages.push({
+                                role: "user",
+                                content: pair.user,
+                            });
+                            apiMessages.push({
+                                role: "assistant",
+                                content: pair.assistant,
+                            });
+                        });
+
+                        // Then add recent pairs
+                        recentPairs.forEach((pair) => {
+                            apiMessages.push({
+                                role: "user",
+                                content: pair.user,
+                            });
+                            apiMessages.push({
+                                role: "assistant",
+                                content: pair.assistant,
+                            });
+                        });
+
+                        apiMessages.push({ role: "user", content: text });
+
+                        // Construct system prompt
+                        let fullSystemPrompt = context || "";
+                        if (fileInstructions) {
+                            fullSystemPrompt += "\n\n" + fileInstructions;
+                        }
+
+                        if (fullSystemPrompt.trim()) {
+                            apiMessages.unshift({
+                                role: "system",
+                                content: fullSystemPrompt,
+                            });
+                        }
+
+                        const payload = {
+                            model: model,
+                            messages: apiMessages,
+                        };
+
+                        // Add temperature parameter
+                        const temperature = parseFloat(temperatureInput.value);
+                        if (!isNaN(temperature)) {
+                            payload.temperature = temperature;
+                        }
+
+                        const headers = {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${apiKey}`,
+                        };
+
+                        const response = await fetch(
+                            "https://api.perplexity.ai/chat/completions",
+                            {
+                                method: "POST",
+                                headers: headers,
+                                body: JSON.stringify(payload),
+                            },
+                        );
+
+                        if (!response.ok) {
+                            const errText = await response.text();
+                            throw new Error(
+                                `Perplexity API error: ${response.status} – ${errText}`,
+                            );
+                        }
+
+                        const data = await response.json();
+                        // OpenAI-compatible response structure
+                        assistantText =
+                            data.choices[0]?.message?.content ||
+                            "(No content returned)";
+                    } else if (provider === "mistral") {
+                        const apiMessages = [];
+
+                        // Get pinned pairs (always included)
+                        const pinnedPairs = conversationPairs.filter(
+                            (p) => p.pinned === true,
+                        );
+
+                        // Get regular included pairs (excluding pinned ones)
+                        const includedPairs = conversationPairs.filter(
+                            (p) => p.include !== false && p.pinned !== true,
+                        );
+                        const recentPairs =
+                            HISTORY_LIMIT === 0
+                                ? includedPairs
+                                : includedPairs.slice(-HISTORY_LIMIT);
+
+                        // Add pinned pairs first
+                        pinnedPairs.forEach((pair) => {
+                            apiMessages.push({
+                                role: "user",
+                                content: pair.user,
+                            });
+                            apiMessages.push({
+                                role: "assistant",
+                                content: pair.assistant,
+                            });
+                        });
+
+                        // Then add recent pairs
+                        recentPairs.forEach((pair) => {
+                            apiMessages.push({
+                                role: "user",
+                                content: pair.user,
+                            });
+                            apiMessages.push({
+                                role: "assistant",
+                                content: pair.assistant,
+                            });
+                        });
+
+                        apiMessages.push({ role: "user", content: text });
+
+                        // Construct system prompt
+                        let fullSystemPrompt = context || "";
+                        if (fileInstructions) {
+                            fullSystemPrompt += "\n\n" + fileInstructions;
+                        }
+
+                        if (fullSystemPrompt.trim()) {
+                            apiMessages.unshift({
+                                role: "system",
+                                content: fullSystemPrompt,
+                            });
+                        }
+
+                        const payload = {
+                            model: model,
+                            messages: apiMessages,
+                        };
+
+                        // Add temperature parameter
+                        const temperature = parseFloat(temperatureInput.value);
+                        if (!isNaN(temperature)) {
+                            payload.temperature = temperature;
+                        }
+
+                        const headers = {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${apiKey}`,
+                        };
+
+                        const response = await fetch(
+                            "https://api.mistral.ai/v1/chat/completions",
+                            {
+                                method: "POST",
+                                headers: headers,
+                                body: JSON.stringify(payload),
+                            },
+                        );
+
+                        if (!response.ok) {
+                            const errText = await response.text();
+                            throw new Error(
+                                `Mistral API error: ${response.status} – ${errText}`,
+                            );
+                        }
+
+                        const data = await response.json();
+                        // OpenAI-compatible response structure
+                        assistantText =
+                            data.choices[0]?.message?.content ||
+                            "(No content returned)";
                     }
 
                     // Calculate final elapsed time
