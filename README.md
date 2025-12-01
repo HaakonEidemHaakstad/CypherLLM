@@ -14,17 +14,33 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
   - Google: `gemini-3-pro-preview`, `gemini-flash-latest`, `gemini-flash-lite-latest`
   - Anthropic: `claude-opus-4-5-20251101`, `claude-sonnet-4-5`, `claude-haiku-4-5`
   - xAI: `grok-4-latest`
-  - DeepSeek: `deepseek-chat`, `deepseek-reasoner`, `deepseek-coder`
-  - Perplexity: `sonar`, `sonar-pro`, `sonar-reasoning`, `sonar-deep-research`
-  - Mistral: `codestral-latest`, `mistral-large-latest`, `mistral-medium-latest`, `mistral-small-latest`
+  - DeepSeek: `deepseek-chat`, `deepseek-reasoner`
+  - Perplexity: `sonar-pro`, `sonar`, `sonar-reasoning`
+  - Mistral: `mistral-large-latest`, `mistral-small-latest`, `pixtral-large-latest`
 - **Provider‑specific controls**
   - OpenAI GPT‑5: reasoning effort + verbosity controls
   - Other models: temperature control
+- **File upload support**
+  - Native file upload for PDFs, DOCX, and images (JPEG, PNG, GIF, WebP)
+  - Provider support:
+    - Full support: OpenAI (all file types)
+    - Partial support: Google Gemini, Anthropic Claude (PDF + images only)
+    - Text fallback: xAI, DeepSeek, Perplexity, Mistral (converted to text)
+  - 2MB file size limit to prevent context window overflow
+  - Files can be toggled on/off per message
+- **Request cancellation**
+  - Stop button to cancel in-progress API requests
+  - Immediate abort using AbortController API
+- **Status indicator & logging**
+  - Color-coded status dot (green/yellow/red) showing system state
+  - Click status dot to view full status log with timestamps
+  - Logs all messages (success, warning, error) with color coding
+  - Clear log functionality
 - **Rich conversation management**
   - Pagination (newer/older) with configurable page size
-  - “Context limit” for how many prior pairs are sent with each request
-  - Per‑pair “Include in context” toggle
-  - Per‑pair **Pin to context** (always included, doesn’t count toward history limit)
+  - "Context limit" for how many prior pairs are sent with each request
+  - Per‑pair "Include in context" toggle
+  - Per‑pair **Pin to context** (always included, doesn't count toward history limit)
   - Collapse/expand whole prompt/response pairs
   - Delete pairs, retry prompt (re‑ask same user message)
 - **System prompt & context view**
@@ -32,11 +48,11 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
   - Settings view showing:
     - Pinned context pairs
     - Active context pairs (paginated & respecting context limit)
-- **Attachments**
-  - Attach one or more local files (text only; read in browser)
+- **Text file attachments**
+  - Attach one or more local text files (read in browser)
   - **Toggle inclusion**: Click an attachment chip to include/exclude it from the context (visualized by opacity)
   - Content is injected into a system message as `[FILE n]` references
-  - “Refresh” menu to re‑read files from disk (e.g., after edits)
+  - "Refresh" menu to re‑read files from disk (e.g., after edits)
 - **Chat persistence**
   - Automatic saving of:
     - Conversation pairs
@@ -46,13 +62,13 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
     - Provider, model, and UI settings
   - Export conversation as JSON (with attachments + metadata)
   - Import conversation from JSON
-  - “New chat” with unsaved‑changes guard
+  - "New chat" with unsaved‑changes guard
 - **API key management**
   - Per‑provider API keys stored in `localStorage`
   - In‑app **API key modal** with:
     - Show/hide key
     - Clear key
-    - Live validation against each provider’s API
+    - Live validation against each provider's API
   - API key status indicator in header
 - **UI niceties**
   - Customizable user avatar and per‑provider assistant avatars (click avatar to upload)
@@ -62,9 +78,10 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
     - Header/footer bars
     - Copy buttons (top and bottom)
     - Collapse/expand toggle
-  - “Thinking…” indicator with animated dots + live timer
+  - "Thinking…" indicator with animated dots + live timer
   - Back‑to‑top floating button
   - Chat name field + quick Save/Load buttons
+  - Status messages truncated with ellipsis to prevent header expansion
 
 ---
 
@@ -72,7 +89,7 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
 
 ### 1. Clone or download
 
-Place `index.html` (and optionally `LICENSE`) into a folder, or clone the repo if you’ve set one up.
+Place `index.html` (and optionally `LICENSE`) into a folder, or clone the repo if you've set one up.
 
 ### 2. Run a simple static server
 
@@ -99,18 +116,11 @@ in a modern browser (Chrome/Edge/Firefox).
 
 1. Choose a **Provider** (top‑right dropdown).
 2. Click the **key icon (🔑)**.
-3. Paste your API key (obtain from:  
-   [OpenAI](https://platform.openai.com/account/api-keys) ·
-   [Google AI Studio](https://aistudio.google.com/app/apikey) ·
-   [Anthropic](https://console.anthropic.com/settings/keys) ·
-   [xAI](https://console.x.ai) ·
-   [DeepSeek](https://platform.deepseek.com) ·
-   [Perplexity](https://www.perplexity.ai/settings/api) ·
-   [Mistral](https://console.mistral.ai/))
+3. Paste your API key (obtain from: [OpenAI](https://platform.openai.com/account/api-keys) | [Google AI Studio](https://aistudio.google.com/app/apikey) | [Anthropic](https://console.anthropic.com/settings/keys) | [xAI](https://console.x.ai/) | [DeepSeek](https://platform.deepseek.com/) | [Perplexity](https://www.perplexity.ai/settings/api) | [Mistral](https://console.mistral.ai/)).
 4. Click **Save** – the app will validate it against the provider.
 5. Repeat for other providers as needed.
 
-> Keys are stored in your browser’s `localStorage` and sent directly from your browser to the provider APIs.  
+> Keys are stored in your browser's `localStorage` and sent directly from your browser to the provider APIs.  
 > **Do not** use this with keys you consider highly sensitive on untrusted machines.
 
 ---
@@ -123,8 +133,34 @@ in a modern browser (Chrome/Edge/Firefox).
 2. (Optional) Adjust **Reasoning/Verbosity** (GPT‑5) or **Temperature**.
 3. Type into the **message box**.
 4. Press **Enter** to send (Shift+Enter for a new line).
+5. Click **Stop** button to cancel an in-progress request.
 
-The app shows a temporary “Thinking…” assistant bubble with a live elapsed‑time counter during each request.
+The app shows a temporary "Thinking…" assistant bubble with a live elapsed‑time counter during each request.
+
+### Status indicator & logging
+
+- The **colored dot** next to "CypherLLM" indicates system status:
+  - **Green**: Normal operation
+  - **Yellow**: Warning (e.g., validating API keys)
+  - **Red**: Error
+- **Click the dot** to open the status log dropdown showing:
+  - All recent status messages with timestamps
+  - Color-coded entries (success/warning/error)
+  - Clear log button to reset history
+- Status messages in the header are automatically truncated with "..." if too long
+
+### File uploads
+
+- Click **📎** (attach icon) near the input box to upload files.
+- Supported file types:
+  - **Documents**: PDF, DOCX (up to 2MB)
+  - **Images**: JPEG, PNG, GIF, WebP (up to 2MB)
+- Files larger than 2MB will be rejected to prevent context window overflow.
+- Provider compatibility:
+  - **OpenAI**: Full support for all file types
+  - **Google Gemini & Anthropic Claude**: PDF and images only (DOCX converted to text)
+  - **xAI, DeepSeek, Perplexity, Mistral**: All files converted to text
+- Uploaded files appear as chips below the input and can be removed individually.
 
 ### System prompt & context
 
@@ -144,7 +180,7 @@ The app shows a temporary “Thinking…” assistant bubble with a live elapsed
 For each prompt/response pair:
 
 - **Include in context**: whether to send this pair in future requests.
-- **📌 Pin to context**: move the pair to the “pinned” list (always included).
+- **📌 Pin to context**: move the pair to the "pinned" list (always included).
 - **Retry prompt**: re‑send the same user message as a fresh request (using current provider/model/settings).
 - **Delete pair**: permanently remove the pair.
 - **Collapse pair**: hides the full texts into a one‑line summary.
@@ -161,9 +197,9 @@ Assistant messages also have a **Copy response** button.
 
 Pinned pairs are always sent, regardless of the context limit.
 
-### Attachments
+### Text file attachments
 
-- Click **📄** near the input box to attach files.
+- Click **📄** near the input box to attach text files.
 - Files are read as text and listed as chips under the input.
 - Content is injected into a system message as `[FILE 1]`, `[FILE 2]`, etc.
 - You can:
@@ -182,7 +218,7 @@ Pinned pairs are always sent, regardless of the context limit.
 - **Save**:
   - Exports JSON containing:
     - All pairs
-    - Attachments’ text content and inclusion state
+    - Attachments' text content and inclusion state
     - Provider/model used
     - System prompt & chat name
 - **Load**:
@@ -205,41 +241,34 @@ Pinned pairs are always sent, regardless of the context limit.
   - **OpenAI**: `POST https://api.openai.com/v1/responses`  
     - Uses `reasoning` and `text.verbosity` for GPT‑5.  
     - Optionally enables `web_search_preview` tool.
+    - Supports native file upload (PDF, DOCX, images) via base64.
   - **Google**: `POST https://generativelanguage.googleapis.com/v1beta/models/*:generateContent`  
     - Uses `google_search` (for certain stable models) and `code_execution` tools where available.
+    - Supports PDF and image uploads (DOCX as text).
   - **Anthropic**: `POST https://api.anthropic.com/v1/messages`  
     - Uses beta tool APIs (`web_search`, `computer`, `bash`, `text_editor`) with appropriate headers.
-  - **xAI**: `POST https://api.x.ai/v1/chat/completions`.
-  - **DeepSeek**: `POST https://api.deepseek.com/v1/chat/completions`  
-    - OpenAI‑compatible Chat Completions format.
-  - **Perplexity**: `POST https://api.perplexity.ai/chat/completions`  
-    - OpenAI‑compatible Chat Completions format (Sonar models with web‑grounded answers).
-  - **Mistral**: `POST https://api.mistral.ai/v1/chat/completions`  
-    - OpenAI‑compatible Chat Completions format.
+    - Supports PDF and image uploads (DOCX as text).
+  - **xAI**: `POST https://api.x.ai/v1/chat/completions`
+    - OpenAI-compatible API.
+    - File uploads converted to text.
+  - **DeepSeek**: `POST https://api.deepseek.com/v1/chat/completions`
+    - OpenAI-compatible API.
+    - File uploads converted to text.
+  - **Perplexity**: `POST https://api.perplexity.ai/chat/completions`
+    - OpenAI-compatible API with web search capabilities.
+    - File uploads converted to text.
+  - **Mistral**: `POST https://api.mistral.ai/v1/chat/completions`
+    - OpenAI-compatible API.
+    - File uploads converted to text.
+- Request cancellation via `AbortController` signal passed to all fetch calls.
 
 You may want to audit/adjust the model IDs, tool configurations, and headers as providers evolve.
-
-### Extending with New Models/Providers
-
-To add a new LLM provider or model to the CypherLLM UI, follow the step‑by‑step recipe in [`ADD_MODEL_SYSTEM_PROMPT.md`](./ADD_MODEL_SYSTEM_PROMPT.md).
-
-That document:
-
-- Lists all the places in `index.html` that need to be updated (provider dropdown, model lists, API key storage, avatars, validation logic, etc.).
-- Includes example code snippets for each step (e.g., how to wire up a new provider’s API endpoint and headers).
-- Is written so that **either a human developer or an LLM** (acting as a code assistant) can mechanically apply all required changes without missing any of the scattered integration points.
-
-Use it whenever:
-
-- You want to add a brand‑new provider.
-- You want to add or rename models for an existing provider.
-- You need to update authentication, endpoints, or validation logic for a provider.
 
 ---
 
 ## Security Considerations
 
-- API keys are stored in plain text in `localStorage` and used directly in browser‑side `fetch` calls.
+- API keys are stored in plain text in `localStorage` and used directly in browser‐side `fetch` calls.
 - Anyone with access to your browser profile can potentially retrieve your keys.
 - Use this tool only on **trusted machines** and with **keys you are comfortable exposing to the browser**.
 
@@ -249,13 +278,20 @@ For production or shared environments, consider moving API calls to a backend se
 
 ## Troubleshooting
 
-- **API errors**: Ensure your API key is valid (check the status indicator). Some models/tools may require specific beta access or billing enabled on your account.
+- **API errors**: 
+  - Ensure your API key is valid (check the status indicator). 
+  - Click the status dot to view detailed error logs.
+  - Some models/tools may require specific beta access or billing enabled on your account.
+- **File upload errors**:
+  - Ensure files are under 2MB to prevent context window overflow.
+  - Check provider compatibility (some providers only support certain file types).
+  - Large PDFs may still exceed token limits even under 2MB.
 - **CORS issues**: Always run via a local HTTP server, not `file://`.
-- **File refresh not working**: After import or restart, re‑attach files to enable the refresh feature (original File objects aren't persisted).
+- **File refresh not working**: After import or restart, re-attach files to enable the refresh feature (original File objects aren't persisted).
 - **Performance**: Large conversations or attachments may slow down the browser due to `localStorage` limits (~5MB). Export and start new chats periodically.
 - **Browser compatibility**: Tested on Chrome 120+, Firefox 120+, Edge 120+. May not work on older browsers or Safari (due to `localStorage` and `fetch` behaviors).
 
-If you encounter issues, check the browser console for errors and ensure your API credits are sufficient.
+If you encounter issues, check the browser console for errors, view the status log (click the status dot), and ensure your API credits are sufficient.
 
 ---
 
