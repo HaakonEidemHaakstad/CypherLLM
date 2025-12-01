@@ -10,15 +10,21 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
 ## Features
 
 - **Multi‑provider support**
-  - OpenAI: `gpt-5.1`, `gpt-5.1-mini`
-  - Google: `gemini-3-pro-preview`, `gemini-flash-latest`, `gemini-flash-lite-latest`
+  - OpenAI: `gpt-5.1`, `gpt-5.1-mini`, `gpt-image-1`
+  - Google: `gemini-3-pro-preview`, `gemini-flash-latest`, `gemini-flash-lite-latest`, `gemini-2.5-flash-image`, `gemini-3-pro-image-preview`
   - Anthropic: `claude-opus-4-5-20251101`, `claude-sonnet-4-5`, `claude-haiku-4-5`
   - xAI: `grok-4-latest`
   - DeepSeek: `deepseek-chat`, `deepseek-reasoner`
   - Perplexity: `sonar-pro`, `sonar`, `sonar-reasoning`
   - Mistral: `mistral-large-latest`, `mistral-small-latest`, `pixtral-large-latest`
+- **Image generation support**
+  - **OpenAI**: `gpt-image-1` (up to 4096×4096 pixels)
+  - **Google**: `gemini-2.5-flash-image` (Nano Banana), `gemini-3-pro-image-preview` (Nano Banana Pro, up to 4K)
+  - Images display during session but are replaced with placeholders when saving (session-only to avoid storage bloat)
+  - Generated images include alt text and captions
 - **Provider‑specific controls**
   - OpenAI GPT‑5: reasoning effort + verbosity controls
+  - Image models: no temperature/reasoning controls (not applicable)
   - Other models: temperature control
 - **File upload support**
   - Native file upload for PDFs, DOCX, and images (JPEG, PNG, GIF, WebP)
@@ -36,6 +42,10 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
   - Click status dot to view full status log with timestamps
   - Logs all messages (success, warning, error) with color coding
   - Clear log functionality
+- **Token counter**
+  - Real-time estimated token usage in Context Settings
+  - Shows system prompt + pinned pairs + active context
+  - Color-coded: green (<50k), yellow (50k-100k), red (>100k)
 - **Rich conversation management**
   - Pagination (newer/older) with configurable page size
   - "Context limit" for how many prior pairs are sent with each request
@@ -46,6 +56,7 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
 - **System prompt & context view**
   - Editable global system prompt, saved in `localStorage`
   - Settings view showing:
+    - Estimated token usage
     - Pinned context pairs
     - Active context pairs (paginated & respecting context limit)
 - **Text file attachments**
@@ -55,12 +66,12 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
   - "Refresh" menu to re‑read files from disk (e.g., after edits)
 - **Chat persistence**
   - Automatic saving of:
-    - Conversation pairs
+    - Conversation pairs (images replaced with placeholders)
     - Attachments (text content + inclusion state)
     - System prompt
     - Chat name
     - Provider, model, and UI settings
-  - Export conversation as JSON (with attachments + metadata)
+  - Export conversation as JSON (with attachments + metadata, images as placeholders)
   - Import conversation from JSON
   - "New chat" with unsaved‑changes guard
 - **API key management**
@@ -78,6 +89,7 @@ It runs entirely in your browser and talks directly to OpenAI, Google Gemini, An
     - Header/footer bars
     - Copy buttons (top and bottom)
     - Collapse/expand toggle
+  - Images rendered inline with responsive sizing
   - "Thinking…" indicator with animated dots + live timer
   - Back‑to‑top floating button
   - Chat name field + quick Save/Load buttons
@@ -130,12 +142,23 @@ in a modern browser (Chrome/Edge/Firefox).
 ### Basic chat
 
 1. Select **Provider** and **Model**.
-2. (Optional) Adjust **Reasoning/Verbosity** (GPT‑5) or **Temperature**.
+2. (Optional) Adjust **Reasoning/Verbosity** (GPT‑5) or **Temperature** (if available).
 3. Type into the **message box**.
 4. Press **Enter** to send (Shift+Enter for a new line).
 5. Click **Stop** button to cancel an in-progress request.
 
 The app shows a temporary "Thinking…" assistant bubble with a live elapsed‑time counter during each request.
+
+### Image generation
+
+1. Select an image model:
+   - OpenAI: `gpt-image-1`
+   - Google: `gemini-2.5-flash-image` or `gemini-3-pro-image-preview`
+2. Type a descriptive prompt (e.g., "a sunset over mountains")
+3. Press Enter to generate
+4. Images display during the session but are saved as placeholders to avoid storage bloat
+
+**Note**: Provider-generated image URLs typically expire after 1-2 hours. Images are replaced with descriptive placeholders when saving/exporting conversations.
 
 ### Status indicator & logging
 
@@ -148,6 +171,20 @@ The app shows a temporary "Thinking…" assistant bubble with a live elapsed‑t
   - Color-coded entries (success/warning/error)
   - Clear log button to reset history
 - Status messages in the header are automatically truncated with "..." if too long
+
+### Token counter
+
+- Open **⚙ Context** settings to view estimated token usage
+- Shows combined tokens for:
+  - System prompt
+  - Pinned context pairs
+  - Active context pairs (respecting history limit)
+  - Attached files
+- Color-coded warnings:
+  - **Green**: < 50,000 tokens (safe)
+  - **Yellow**: 50,000 - 100,000 tokens (caution)
+  - **Red**: > 100,000 tokens (may exceed context limits)
+- Updates in real-time as you edit system prompt or change context
 
 ### File uploads
 
@@ -165,6 +202,9 @@ The app shows a temporary "Thinking…" assistant bubble with a live elapsed‑t
 ### System prompt & context
 
 - Click **⚙ Context** to open the **Context Settings** panel.
+- **Estimated Token Usage**:
+  - Real-time token counter at the top
+  - Color-coded based on usage level
 - **System Prompt / Context**:
   - Global instructions sent with every request.
   - Auto‑saved to `localStorage`.
@@ -217,7 +257,7 @@ Pinned pairs are always sent, regardless of the context limit.
 - **Chat name**: a short label stored with the conversation in `localStorage`.
 - **Save**:
   - Exports JSON containing:
-    - All pairs
+    - All pairs (images replaced with placeholders)
     - Attachments' text content and inclusion state
     - Provider/model used
     - System prompt & chat name
@@ -234,17 +274,26 @@ Pinned pairs are always sent, regardless of the context limit.
 
 - Pure HTML/CSS/JS.
 - External libs via CDN:
-  - `marked` for Markdown parsing.
+  - `marked` for Markdown parsing (handles image rendering).
   - `highlight.js` (GitHub Dark theme) for syntax highlighting.
 - All state (conversation, attachments, prompts, settings, avatars, API keys) is stored in `localStorage`.
+- **Image handling**:
+  - Images display during active sessions via markdown rendering
+  - Automatically stripped and replaced with descriptive placeholders when saving
+  - Prevents localStorage bloat from base64 image data
 - API calls:
-  - **OpenAI**: `POST https://api.openai.com/v1/responses`  
+  - **OpenAI Chat**: `POST https://api.openai.com/v1/responses`  
     - Uses `reasoning` and `text.verbosity` for GPT‑5.  
     - Optionally enables `web_search_preview` tool.
     - Supports native file upload (PDF, DOCX, images) via base64.
+  - **OpenAI Images**: `POST https://api.openai.com/v1/images/generations`
+    - Used for `gpt-image-1` model.
+    - Returns image URLs (expire after 1-2 hours).
   - **Google**: `POST https://generativelanguage.googleapis.com/v1beta/models/*:generateContent`  
-    - Uses `google_search` (for certain stable models) and `code_execution` tools where available.
+    - Uses `google_search` and `code_execution` tools for chat models.
     - Supports PDF and image uploads (DOCX as text).
+    - Image models use `response_modalities: ["TEXT", "IMAGE"]`.
+    - Returns base64-encoded images inline.
   - **Anthropic**: `POST https://api.anthropic.com/v1/messages`  
     - Uses beta tool APIs (`web_search`, `computer`, `bash`, `text_editor`) with appropriate headers.
     - Supports PDF and image uploads (DOCX as text).
@@ -261,6 +310,7 @@ Pinned pairs are always sent, regardless of the context limit.
     - OpenAI-compatible API.
     - File uploads converted to text.
 - Request cancellation via `AbortController` signal passed to all fetch calls.
+- Token estimation using ~4 characters per token approximation.
 
 You may want to audit/adjust the model IDs, tool configurations, and headers as providers evolve.
 
@@ -286,6 +336,14 @@ For production or shared environments, consider moving API calls to a backend se
   - Ensure files are under 2MB to prevent context window overflow.
   - Check provider compatibility (some providers only support certain file types).
   - Large PDFs may still exceed token limits even under 2MB.
+- **Image generation issues**:
+  - OpenAI image URLs expire after 1-2 hours.
+  - Images are session-only and replaced with placeholders when saving.
+  - Check console for detailed error messages.
+- **Token limit warnings**:
+  - Use the token counter in Context Settings to monitor usage.
+  - Consider unpinning old context pairs or reducing history limit.
+  - Remove unused file attachments.
 - **CORS issues**: Always run via a local HTTP server, not `file://`.
 - **File refresh not working**: After import or restart, re-attach files to enable the refresh feature (original File objects aren't persisted).
 - **Performance**: Large conversations or attachments may slow down the browser due to `localStorage` limits (~5MB). Export and start new chats periodically.
