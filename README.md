@@ -1,5 +1,3 @@
-Here is the updated `README.md` file. I have added the details regarding the attachment toggle feature in both the **Features** list and the **Usage Guide** section to accurately reflect the functionality present in the `index.html` code.
-
 # CypherLLM
 
 CypherLLM is a single‑page, local, multi‑provider chat client for LLMs.  
@@ -204,6 +202,11 @@ Pinned pairs are always sent, regardless of the context limit.
   - **xAI**: `POST https://api.x.ai/v1/chat/completions`.
 
 You may want to audit/adjust the model IDs, tool configurations, and headers as providers evolve.
+
+### Extending with New Models/Providers
+
+To add a new LLM provider or model to the CypherLLM UI, follow the step‑by‑step recipe in [`ADD_MODEL_SYSTEM_PROMPT.md`](./ADD_MODEL_SYSTEM_PROMPT.md).  
+That document is written so that **either a human developer or an LLM** (acting as a code assistant) can mechanically apply all required changes across the codebase.
 
 ---
 
