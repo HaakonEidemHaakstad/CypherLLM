@@ -1,9 +1,33 @@
 # CypherLLM
 
-CypherLLM is a single‑page, local, multi‑provider chat client for LLMs.  
+**Stop fighting context limits. Start managing context.**
+
+CypherLLM is a single‑page, local, multi‑provider chat client for LLMs that gives you **surgical control over what your AI sees**. 
+
 It runs entirely in your browser and talks directly to OpenAI, Google Gemini, Anthropic Claude, xAI Grok, DeepSeek, Perplexity, and Mistral using your own API keys.
 
 > No backend, no build step – just open `index.html` with a static server and start chatting.
+
+## Why CypherLLM?
+
+**Context Management That Actually Works**
+- **Pin critical context** that should always be present (setup instructions, requirements, examples)
+- **Include/exclude specific pairs** to control exactly what the LLM sees
+- **Real-time token counter** shows exactly what you're sending
+- **Never lose your setup** when you hit token limits – just exclude old exploration, keep what matters
+
+**Multi-Provider Flexibility**
+- Switch between providers/models **within the same conversation**
+- Compare responses without re-typing prompts
+- Pay only for what you use via API (typically **$5-10/month** vs $60/month in subscriptions)
+- No vendor lock-in – use the best model for each task
+
+**Power-User Features**
+- Request cancellation (stop button for in-progress requests)
+- Status logging with clickable history (debug API issues instantly)
+- File uploads (PDF, DOCX, images) with toggle control
+- Export/import conversations with full metadata
+- All data stays local – no telemetry, no tracking
 
 ---
 
