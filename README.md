@@ -1,8 +1,10 @@
 # CypherLLM
 
-**Stop fighting context limits. Start managing context.**
+**Ignorance is bliss. Context is power.**
 
 CypherLLM is a single‑page, local, multi‑provider chat client for LLMs that gives you **surgical control over what your AI sees**. 
+
+Named after the character from The Matrix, CypherLLM embraces the core question: *"What should I be aware of?"* Most chat interfaces hide the machinery and force you into "all or nothing" context. CypherLLM shows you everything – tokens sent, context included, API calls made – and lets you **choose what to keep**.
 
 It runs entirely in your browser and talks directly to OpenAI, Google Gemini, Anthropic Claude, xAI Grok, DeepSeek, Perplexity, and Mistral using your own API keys.
 
