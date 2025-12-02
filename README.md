@@ -1,6 +1,6 @@
 # CypherLLM
 
-**Ignorance is bliss. Context is power.**
+**Ignorance is bliss. Knowledge is power.**
 
 CypherLLM is a single‑page, local, multi‑provider chat client for LLMs that gives you **surgical control over what your AI sees**. 
 
