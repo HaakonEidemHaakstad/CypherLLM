@@ -5925,6 +5925,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         if (typeof data.context === "string") {
                             contextInput.value = data.context;
+                            settingsContextInput.value = data.context;
                             localStorage.setItem(
                                 CONTEXT_STORAGE_KEY,
                                 data.context,
