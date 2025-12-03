@@ -1,6 +1,6 @@
 # CypherLLM
 
-**Ignorance is bliss. Knowledge is power.**
+**I don't wanna remember nothing. Nothing, you understand? And I wanna be rich. Y’know, someone important…like an actor.**
 
 CypherLLM is a single‑page, local, multi‑provider chat client for LLMs that gives you **surgical control over what your AI sees**. 
 
