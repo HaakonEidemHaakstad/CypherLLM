@@ -1856,6 +1856,50 @@
             #back-to-top.show {
                 display: flex;
             }
+
+            /* Drag and drop styles */
+            #input-area.drag-over {
+                background: rgba(99, 102, 241, 0.15);
+                border-top: 2px solid #6366f1;
+            }
+
+            #input-inner.drag-over {
+                background: rgba(99, 102, 241, 0.1);
+                border: 2px dashed #6366f1;
+                transform: scale(1.01);
+                transition: all 0.2s ease;
+            }
+
+            .drag-drop-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(99, 102, 241, 0.05);
+                border: 3px dashed #6366f1;
+                border-radius: 12px;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                pointer-events: none;
+                z-index: 10;
+            }
+
+            .drag-drop-overlay.show {
+                display: flex;
+            }
+
+            .drag-drop-text {
+                font-size: 18px;
+                font-weight: 600;
+                color: #a5b4fc;
+                text-align: center;
+                padding: 20px;
+                background: rgba(2, 6, 23, 0.95);
+                border-radius: 12px;
+                border: 1px solid #6366f1;
+            }
         </style>
     </head>
     <body>
@@ -2403,6 +2447,11 @@
                 </div>
 
                 <div id="input-area">
+                    <div class="drag-drop-overlay">
+                        <div class="drag-drop-text">
+                            📄 Drop files here to attach
+                        </div>
+                    </div>
                     <div id="refresh-dropdown"></div>
                     <div id="input-inner">
                         <div id="input-attachments-list"></div>
@@ -4956,6 +5005,82 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 const files = Array.from(e.target.files || []);
                 handleAttachedFiles(files);
                 attachFileInput.value = "";
+            });
+
+            // ========= DRAG AND DROP FUNCTIONALITY =========
+            const inputArea = document.getElementById("input-area");
+            const inputInner = document.getElementById("input-inner");
+            const dragDropOverlay =
+                document.querySelector(".drag-drop-overlay");
+            let dragCounter = 0;
+
+            // Prevent default drag behaviors on the whole document
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(
+                (eventName) => {
+                    document.body.addEventListener(
+                        eventName,
+                        (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                        },
+                        false,
+                    );
+                },
+            );
+
+            // Handle drag enter on input area
+            inputArea.addEventListener("dragenter", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dragCounter++;
+
+                if (e.dataTransfer.types.includes("Files")) {
+                    inputArea.classList.add("drag-over");
+                    inputInner.classList.add("drag-over");
+                    dragDropOverlay.classList.add("show");
+                }
+            });
+
+            // Handle drag over on input area
+            inputArea.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.dataTransfer) {
+                    e.dataTransfer.dropEffect = "copy";
+                }
+            });
+
+            // Handle drag leave on input area
+            inputArea.addEventListener("dragleave", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dragCounter--;
+
+                if (dragCounter === 0) {
+                    inputArea.classList.remove("drag-over");
+                    inputInner.classList.remove("drag-over");
+                    dragDropOverlay.classList.remove("show");
+                }
+            });
+
+            // Handle drop on input area
+            inputArea.addEventListener("drop", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                dragCounter = 0;
+                inputArea.classList.remove("drag-over");
+                inputInner.classList.remove("drag-over");
+                dragDropOverlay.classList.remove("show");
+
+                const files = Array.from(e.dataTransfer.files || []);
+                if (files.length > 0) {
+                    handleAttachedFiles(files);
+                    updateStatus(
+                        `Added ${files.length} file(s) via drag & drop`,
+                        "success",
+                    );
+                }
             });
 
             // ========= LOCAL CONVERSATION STORAGE =========
