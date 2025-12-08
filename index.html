@@ -1529,37 +1529,43 @@
             }
 
             .number-btn-inline {
-                border: none !important;
-                outline: none !important;
-                box-shadow: none !important;
-                padding: 2px 8px;
-                background: transparent;
+                padding: 4px 8px;
+                border: 1px solid var(--border-subtle);
+                background: #020617;
                 color: var(--text-main);
-                font-size: 12px;
-                font-weight: 600;
+                font-size: 11px;
                 cursor: pointer;
-                min-width: 24px;
-                height: 15;
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
                 transition: background 0.15s ease;
+                outline: none;
+                position: relative;
+                z-index: 1;
+                min-width: 28px;
             }
 
             .number-btn-inline:hover {
                 background: #0a0f1f;
-                border: none !important;
             }
 
             .number-btn-inline:active {
                 background: #1f2937;
-                border: none !important;
             }
 
-            .number-btn-inline:focus {
-                outline: none !important;
-                border: none !important;
-                box-shadow: none !important;
+            .number-btn-inline:first-child {
+                border-radius: 999px 0 0 999px;
+            }
+
+            .number-btn-inline:last-child {
+                border-radius: 0 999px 999px 0;
+            }
+
+            #page-size-display:hover,
+            #history-limit-display:hover {
+                background: #0a0f1f;
+                border-top-color: #4b5563;
+                border-bottom-color: #4b5563;
             }
 
             #refresh-files-btn {
@@ -2213,10 +2219,7 @@
                                     style="
                                         display: inline-flex;
                                         align-items: center;
-                                        border: 1px solid var(--border-subtle);
-                                        border-radius: 4px;
-                                        background: #020617;
-                                        overflow: hidden;
+                                        margin: 0 -5px;
                                     "
                                 >
                                     <button
@@ -2231,14 +2234,22 @@
                                         min="0"
                                         max="100"
                                         style="
-                                            width: 25px;
+                                            width: 40px;
                                             text-align: center;
-                                            font-size: 12px;
+                                            font-size: 11px;
                                             color: var(--text-main);
-                                            background: transparent;
-                                            border: none;
-                                            padding: 1px 4px;
+                                            background: #020617;
+                                            border-top: 1px solid
+                                                var(--border-subtle);
+                                            border-bottom: 1px solid
+                                                var(--border-subtle);
+                                            border-left: none;
+                                            border-right: none;
+                                            padding: 4px 8px;
                                             outline: none;
+                                            position: relative;
+                                            z-index: 2;
+                                            margin: 0 -8px;
                                         "
                                         title="Number of conversation pairs to display per page (0 = unlimited)"
                                         value="10"
@@ -2264,10 +2275,7 @@
                                     style="
                                         display: inline-flex;
                                         align-items: center;
-                                        border: 1px solid var(--border-subtle);
-                                        border-radius: 4px;
-                                        background: #020617;
-                                        overflow: hidden;
+                                        margin: 0 -5px;
                                     "
                                 >
                                     <button
@@ -2282,14 +2290,22 @@
                                         min="0"
                                         max="50"
                                         style="
-                                            width: 25px;
+                                            width: 40px;
                                             text-align: center;
-                                            font-size: 12px;
+                                            font-size: 11px;
                                             color: var(--text-main);
-                                            background: transparent;
-                                            border: none;
-                                            padding: 1px 4px;
+                                            background: #020617;
+                                            border-top: 1px solid
+                                                var(--border-subtle);
+                                            border-bottom: 1px solid
+                                                var(--border-subtle);
+                                            border-left: none;
+                                            border-right: none;
+                                            padding: 4px 8px;
                                             outline: none;
+                                            position: relative;
+                                            z-index: 2;
+                                            margin: 0 -8px;
                                         "
                                         title="Maximum number of recent conversation pairs to include in context (0 = unlimited)"
                                         value="12"
@@ -2310,20 +2326,6 @@
                                     style="display: none"
                                 />
 
-                                <input
-                                    id="chatname-field"
-                                    type="text"
-                                    placeholder="Chat name..."
-                                    style="
-                                        width: 150px;
-                                        padding: 4px 8px;
-                                        border-radius: 999px;
-                                        border: 1px solid var(--border-subtle);
-                                        background: #020617;
-                                        color: var(--text-main);
-                                        font-size: 11px;
-                                    "
-                                />
                                 <button id="export-btn" class="toolbar-btn">
                                     Save
                                 </button>
@@ -2685,7 +2687,6 @@
             const activeNextPageBtn =
                 document.getElementById("active-next-page");
             const activePageInfo = document.getElementById("active-page-info");
-            const chatnameField = document.getElementById("chatname-field");
             const apiKeyBtn = document.getElementById("api-key-btn");
             const apiKeyStatus = document.getElementById("api-key-status");
             const apiKeyModal = document.getElementById("api-key-modal");
@@ -2952,7 +2953,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             function loadChatName() {
                 const saved = localStorage.getItem(CHATNAME_STORAGE_KEY);
                 currentChatName = saved || "";
-                chatnameField.value = currentChatName;
             }
 
             function getContextPrompt() {
@@ -3748,11 +3748,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             });
 
             // Handle chat name field
-            chatnameField.addEventListener("input", () => {
-                currentChatName = chatnameField.value;
-                localStorage.setItem(CHATNAME_STORAGE_KEY, currentChatName);
-            });
-
             // ========= API KEY & PROVIDER LOGIC =========
             function loadApiKeys() {
                 const oaKey = localStorage.getItem(APIKEY_OPENAI_STORAGE_KEY);
@@ -5165,7 +5160,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     // Load chat name from localStorage data
                     if (typeof data.chatName === "string") {
                         currentChatName = data.chatName;
-                        chatnameField.value = data.chatName;
                         localStorage.setItem(
                             CHATNAME_STORAGE_KEY,
                             data.chatName,
@@ -5906,7 +5900,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                 // Clear chat name
                 currentChatName = "";
-                chatnameField.value = "";
                 localStorage.setItem(CHATNAME_STORAGE_KEY, "");
 
                 saveConversationToLocal();
@@ -6086,7 +6079,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                 ? data.chatName
                                 : "";
                         currentChatName = chatName;
-                        chatnameField.value = chatName;
                         localStorage.setItem(CHATNAME_STORAGE_KEY, chatName);
 
                         conversationPairs = data.pairs.map((p) => ({
@@ -6436,26 +6428,18 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             );
                         }
 
-                        const data = await response.json();
                         // Handle streaming response
                         const reader = response.body.getReader();
                         const decoder = new TextDecoder();
                         let buffer = "";
 
-                        // Parse Responses API output structure
-                        // Find the message item in the output array
-                        const messageItem = data.output?.find(
-                            (item) => item.type === "message",
                         // Get the assistant message bubble for streaming (not the user bubble)
                         const assistantRow = pendingAssistantNode.querySelector(
                             ".message-row.pending-assistant",
                         );
-                        const textContent = messageItem?.content?.find(
-                            (c) => c.type === "output_text",
                         const streamingBubble = assistantRow.querySelector(
                             ".message-bubble.assistant",
                         );
-                        assistantText = (textContent?.text || "").trim();
                         streamingBubble.classList.remove("thinking");
                         streamingBubble.innerHTML = "";
                         assistantText = "";
@@ -6643,7 +6627,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             ];
                         }
 
-                        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?key=${apiKey}&alt=sse`;
 
                         const response = await fetch(url, {
@@ -6662,45 +6645,11 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             );
                         }
 
-                        const data = await response.json();
                         // Handle streaming response
                         const reader = response.body.getReader();
                         const decoder = new TextDecoder();
                         let buffer = "";
 
-                        // Google response structure
-                        const candidates = data.candidates || [];
-                        if (
-                            candidates.length > 0 &&
-                            candidates[0].content &&
-                            candidates[0].content.parts
-                        ) {
-                            // Handle both text and image parts
-                            const parts = candidates[0].content.parts;
-                            const textParts = [];
-
-                            parts.forEach((part) => {
-                                if (part.text) {
-                                    textParts.push(part.text);
-                                } else if (part.inlineData) {
-                                    // Image part - convert to markdown (camelCase)
-                                    const mimeType =
-                                        part.inlineData.mimeType || "image/png";
-                                    const base64Data = part.inlineData.data;
-                                    const dataUrl = `data:${mimeType};base64,${base64Data}`;
-                                    textParts.push(
-                                        `![Generated image](${dataUrl})`,
-                                    );
-                                } else if (part.inline_data) {
-                                    // Image part - convert to markdown (snake_case)
-                                    const mimeType =
-                                        part.inline_data.mime_type ||
-                                        "image/png";
-                                    const base64Data = part.inline_data.data;
-                                    const dataUrl = `data:${mimeType};base64,${base64Data}`;
-                                    textParts.push(
-                                        `![Generated image](${dataUrl})`,
-                                    );
                         const assistantRow = pendingAssistantNode.querySelector(
                             ".message-row.pending-assistant",
                         );
@@ -6771,12 +6720,9 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                         // Skip invalid JSON
                                     }
                                 }
-                            });
                             }
                         }
 
-                            assistantText = textParts.join("\n\n");
-                        } else {
                         assistantText = assistantText.trim();
                         if (!assistantText) {
                             assistantText = "(No content returned)";
@@ -6915,10 +6861,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             );
                         }
 
-                        const data = await response.json();
-                        assistantText = (
-                            data.choices?.[0]?.message?.content || ""
-                        ).trim();
                         // Handle streaming response
                         const reader = response.body.getReader();
                         const decoder = new TextDecoder();
@@ -7118,10 +7060,8 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             "anthropic-dangerous-direct-browser-access": "true",
                         };
 
-                        // Add beta headers for computer use and advanced tool use
                         // Add beta headers for computer use, advanced tool use, and streaming
                         headers["anthropic-beta"] =
-                            "computer-use-2025-01-24,advanced-tool-use-2025-11-20";
                             "computer-use-2025-01-24,advanced-tool-use-2025-11-20,fine-grained-tool-streaming-2025-05-14";
 
                         const response = await fetch(
@@ -7141,14 +7081,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             );
                         }
 
-                        const data = await response.json();
-                        // Anthropic response structure
-                        if (data.content && Array.isArray(data.content)) {
-                            assistantText = data.content
-                                .filter((block) => block.type === "text")
-                                .map((block) => block.text)
-                                .join("");
-                        } else {
                         // Handle streaming response
                         const reader = response.body.getReader();
                         const decoder = new TextDecoder();
@@ -7346,11 +7278,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             );
                         }
 
-                        const data = await response.json();
-                        // OpenAI-compatible response structure
-                        assistantText =
-                            data.choices[0]?.message?.content ||
-                            "(No content returned)";
                         // Handle streaming response
                         const reader = response.body.getReader();
                         const decoder = new TextDecoder();
@@ -7539,11 +7466,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             );
                         }
 
-                        const data = await response.json();
-                        // OpenAI-compatible response structure
-                        assistantText =
-                            data.choices[0]?.message?.content ||
-                            "(No content returned)";
                         // Handle streaming response
                         const reader = response.body.getReader();
                         const decoder = new TextDecoder();
@@ -7732,11 +7654,6 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             );
                         }
 
-                        const data = await response.json();
-                        // OpenAI-compatible response structure
-                        assistantText =
-                            data.choices[0]?.message?.content ||
-                            "(No content returned)";
                         // Handle streaming response
                         const reader = response.body.getReader();
                         const decoder = new TextDecoder();
