@@ -4,6 +4,10 @@
         <meta charset="UTF-8" />
         <title>CypherLLM</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
         <link
             rel="icon"
             type="image/png"
@@ -1421,6 +1425,8 @@
                 background: var(--bg-input);
                 padding: 14px 16px 14px 16px;
                 position: relative;
+                /* Add safe area for mobile devices with navigation bars */
+                padding-bottom: max(14px, env(safe-area-inset-bottom));
             }
 
             #input-inner {
