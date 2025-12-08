@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8" />
         <title>CypherLLM</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
             name="viewport"
             content="width=device-width, initial-scale=1.0, viewport-fit=cover"
@@ -1780,7 +1779,7 @@
 
                 #input-area {
                     padding-bottom: calc(
-                        14px + env(safe-area-inset-bottom, 0px)
+                        24px + env(safe-area-inset-bottom, 0px)
                     );
                 }
 
@@ -1808,7 +1807,7 @@
             /* Specific adjustments for devices with bottom navigation bars */
             @supports (padding-bottom: env(safe-area-inset-bottom)) {
                 #input-area {
-                    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+                    padding-bottom: calc(24px + env(safe-area-inset-bottom));
                 }
             }
 
