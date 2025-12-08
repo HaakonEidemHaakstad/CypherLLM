@@ -3,6 +3,7 @@
 A powerful, single-file web application for interacting with multiple AI providers through a clean, modern chat interface. Built with streaming responses, advanced context management, and support for file attachments.
 
 **Version:** 2.0  
+**Version:** 2.1  
 **File:** `index.html` - completely self-contained (HTML + CSS + JavaScript)
 
 ---
@@ -48,6 +49,8 @@ A powerful, single-file web application for interacting with multiple AI provide
 - **Status logging** with visual indicators
 - **Back to top** button for long conversations
 - **Keyboard shortcuts** (Ctrl+S to save, etc.)
+- **PWA support** - Install as standalone app on mobile/desktop (requires HTTPS)
+- **Mobile optimized** - Responsive design with safe area support for tablet navigation bars
 
 ### Model-Specific Features
 - **OpenAI GPT-5**: Reasoning effort (none/minimal/low/medium/high) and verbosity controls
@@ -224,6 +227,8 @@ NEW! You can now drag files directly onto the input area:
 1. Enter a name in the "Chat name..." field
 2. Click **Save**
 3. Downloads a JSON file with:
+1. Click **Save**
+2. Downloads a JSON file with:
    - All conversation pairs
    - File attachments
    - System prompt
@@ -248,6 +253,7 @@ NEW! You can now drag files directly onto the input area:
 - **CDN libraries**: Marked.js (markdown) and Highlight.js (syntax highlighting)
 - **localStorage**: All data persisted in browser
 - **Direct API calls**: Browser → AI Provider APIs (no backend)
+- **PWA-ready**: Includes service worker and manifest for installable app experience
 
 ### Streaming Implementation
 
@@ -355,6 +361,52 @@ Validation status shown as colored dot: ● Red (no key), ● Yellow (has key), 
 - DeepSeek, xAI, Perplexity, Mistral follow OpenAI format
 - If CORS issues persist, you'll need a backend proxy
 
+### PWA installation not showing
+- PWAs require **HTTPS** to work (not http:// or file://)
+- Deploy to GitHub Pages, Netlify, Vercel, or any HTTPS host
+- For local testing, use an HTTPS development server
+- Check DevTools → Application → Manifest to verify PWA setup
+- On mobile, look for "Add to Home Screen" in browser menu
+
+### Mobile input field blocked by navigation bar
+- The app includes safe area padding for mobile devices
+- If issues persist, try adjusting the padding in the mobile media query
+- Tested on tablets with bottom navigation bars
+
+---
+
+## Progressive Web App (PWA)
+
+CypherLLM can be installed as a standalone app on your device:
+
+### Installation Requirements
+- **HTTPS connection** (required for PWA)
+- Modern browser (Chrome, Edge, Safari, Firefox)
+
+### How to Install
+
+**Desktop:**
+1. Visit the site via HTTPS
+2. Look for install icon (⊕) in browser address bar
+3. Click to install as desktop app
+
+**Mobile/Tablet:**
+1. Visit the site via HTTPS
+2. Tap browser menu (⋮)
+3. Select "Add to Home Screen" or "Install"
+4. App icon appears on home screen
+
+**iOS Safari:**
+1. Tap share button (□↑)
+2. Select "Add to Home Screen"
+3. Customize name and tap "Add"
+
+### PWA Features
+- **Offline support** - App cached for offline access (API calls need connection)
+- **Standalone window** - Runs without browser UI
+- **Home screen icon** - Quick access like native apps
+- **Optimized for mobile** - Safe area support for navigation bars
+
 ---
 
 ## License
@@ -399,6 +451,15 @@ Contributions are welcome! This is a single-file project, so:
 ## Changelog
 
 ### Version 2.0 (Current)
+### Version 2.1 (Current)
+- ✨ Added Progressive Web App (PWA) support
+- ✨ Added mobile-optimized UI with safe area support for navigation bars
+- ✨ Enhanced number input controls with seamless button integration
+- 🔧 Removed chat name field for cleaner interface
+- 🔧 Fixed load function compatibility (no longer requires chat name in JSON)
+- 📱 Mobile input field positioning improvements for tablets
+
+### Version 2.0
 - ✨ Added real-time streaming for all providers
 - ✨ Added drag & drop file attachments
 - ✨ Added detailed API key validation with provider names
