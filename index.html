@@ -66,7 +66,9 @@
                 justify-content: center;
                 align-items: stretch;
                 height: 100vh;
+                height: calc(100vh - env(safe-area-inset-bottom));
                 overflow: hidden;
+                padding-bottom: env(safe-area-inset-bottom);
             }
 
             #app {
@@ -1776,6 +1778,12 @@
                     border-radius: 12px;
                 }
 
+                #input-area {
+                    padding-bottom: calc(
+                        14px + env(safe-area-inset-bottom, 0px)
+                    );
+                }
+
                 header {
                     flex-direction: column;
                     align-items: flex-start;
@@ -1794,6 +1802,13 @@
                 #footer-hint {
                     flex-direction: column;
                     align-items: flex-start;
+                }
+            }
+
+            /* Specific adjustments for devices with bottom navigation bars */
+            @supports (padding-bottom: env(safe-area-inset-bottom)) {
+                #input-area {
+                    padding-bottom: calc(14px + env(safe-area-inset-bottom));
                 }
             }
 
