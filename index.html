@@ -7863,39 +7863,16 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
             // ========= PWA SERVICE WORKER =========
             if ("serviceWorker" in navigator) {
-                // Inline service worker
-                const swCode = `
-                    const CACHE_NAME = 'cypherllm-v1';
-                    const urlsToCache = [
-                        './',
-                        './index.html'
-                    ];
-
-                    self.addEventListener('install', event => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME)
-                                .then(cache => cache.addAll(urlsToCache))
-                        );
-                    });
-
-                    self.addEventListener('fetch', event => {
-                        event.respondWith(
-                            caches.match(event.request)
-                                .then(response => response || fetch(event.request))
-                        );
-                    });
-                `;
-
-                const blob = new Blob([swCode], {
-                    type: "application/javascript",
-                });
-                const swUrl = URL.createObjectURL(blob);
-
                 navigator.serviceWorker
-                    .register(swUrl)
-                    .then((reg) => console.log("Service Worker registered"))
+                    .register("./sw.js")
+                    .then((reg) =>
+                        console.log("Service Worker registered:", reg),
+                    )
                     .catch((err) =>
-                        console.log("Service Worker registration failed:", err),
+                        console.error(
+                            "Service Worker registration failed:",
+                            err,
+                        ),
                     );
             }
         </script>
