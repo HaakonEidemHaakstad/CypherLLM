@@ -2,7 +2,6 @@
 
 A powerful, single-file web application for interacting with multiple AI providers through a clean, modern chat interface. Built with streaming responses, advanced context management, and support for file attachments.
 
-**Version:** 2.0  
 **Version:** 2.1  
 **File:** `index.html` - completely self-contained (HTML + CSS + JavaScript)
 
@@ -224,9 +223,6 @@ NEW! You can now drag files directly onto the input area:
 ### Saving / Loading conversations
 
 **Export conversation:**
-1. Enter a name in the "Chat name..." field
-2. Click **Save**
-3. Downloads a JSON file with:
 1. Click **Save**
 2. Downloads a JSON file with:
    - All conversation pairs
@@ -450,7 +446,6 @@ Contributions are welcome! This is a single-file project, so:
 
 ## Changelog
 
-### Version 2.0 (Current)
 ### Version 2.1 (Current)
 - ✨ Added Progressive Web App (PWA) support
 - ✨ Added mobile-optimized UI with safe area support for navigation bars
