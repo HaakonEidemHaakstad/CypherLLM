@@ -2781,6 +2781,32 @@
             let lastExportedState = null; // Track last exported conversation state
             let hasUnsavedChangesFlag = false; // Flag to track if there are changes since last export
 
+            // Helper function to check if user is scrolled near bottom
+            // Returns true if within 100px of bottom (to allow auto-scroll)
+            function isScrolledToBottom() {
+                const threshold = 100;
+                return (
+                    messagesDiv.scrollHeight -
+                        messagesDiv.scrollTop -
+                        messagesDiv.clientHeight <
+                    threshold
+                );
+            }
+
+            // Helper function to keep scroll locked during streaming
+            // Keeps the user's message at the bottom of viewport
+            function keepScrollAtMessage(assistantRow) {
+                const userRow = assistantRow
+                    .closest(".pending-block")
+                    ?.querySelector(".message-row:not(.pending-assistant)");
+                if (userRow) {
+                    userRow.scrollIntoView({
+                        behavior: "instant",
+                        block: "end",
+                    });
+                }
+            }
+
             // Helper function to update status in header
             // type can be: 'success', 'warning', 'error', or null for default
             function updateStatus(message, type = null) {
@@ -6471,6 +6497,17 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         );
                         streamingBubble.classList.remove("thinking");
                         streamingBubble.innerHTML = "";
+
+                        // Lock scroll position when streaming starts
+                        const userRow = pendingAssistantNode.querySelector(
+                            ".message-row:not(.pending-assistant)",
+                        );
+                        if (userRow) {
+                            userRow.scrollIntoView({
+                                behavior: "instant",
+                                block: "end",
+                            });
+                        }
                         assistantText = "";
 
                         while (true) {
@@ -6499,8 +6536,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                             streamingBubble.innerHTML =
                                                 marked.parse(assistantText);
                                             enhanceCodeBlocks();
-                                            messagesDiv.scrollTop =
-                                                messagesDiv.scrollHeight;
+                                            // Don't force scroll during streaming - let user scroll freely
                                         } else if (
                                             parsed.type ===
                                             "response.output_text.done"
@@ -6687,6 +6723,17 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         );
                         streamingBubble.classList.remove("thinking");
                         streamingBubble.innerHTML = "";
+
+                        // Lock scroll position when streaming starts
+                        const userRow = pendingAssistantNode.querySelector(
+                            ".message-row:not(.pending-assistant)",
+                        );
+                        if (userRow) {
+                            userRow.scrollIntoView({
+                                behavior: "instant",
+                                block: "end",
+                            });
+                        }
                         assistantText = "";
                         const textParts = [];
 
@@ -6742,8 +6789,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                             streamingBubble.innerHTML =
                                                 marked.parse(assistantText);
                                             enhanceCodeBlocks();
-                                            messagesDiv.scrollTop =
-                                                messagesDiv.scrollHeight;
+                                            // Don't force scroll during streaming - let user scroll freely
                                         }
                                     } catch (e) {
                                         // Skip invalid JSON
@@ -6903,6 +6949,17 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         );
                         streamingBubble.classList.remove("thinking");
                         streamingBubble.innerHTML = "";
+
+                        // Lock scroll position when streaming starts
+                        const userRow = pendingAssistantNode.querySelector(
+                            ".message-row:not(.pending-assistant)",
+                        );
+                        if (userRow) {
+                            userRow.scrollIntoView({
+                                behavior: "instant",
+                                block: "end",
+                            });
+                        }
                         assistantText = "";
 
                         while (true) {
@@ -6927,8 +6984,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                             streamingBubble.innerHTML =
                                                 marked.parse(assistantText);
                                             enhanceCodeBlocks();
-                                            messagesDiv.scrollTop =
-                                                messagesDiv.scrollHeight;
+                                            // Don't force scroll during streaming - let user scroll freely
                                         }
                                     } catch (e) {
                                         // Skip invalid JSON
@@ -7123,6 +7179,17 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         );
                         streamingBubble.classList.remove("thinking");
                         streamingBubble.innerHTML = "";
+
+                        // Lock scroll position when streaming starts
+                        const userRow = pendingAssistantNode.querySelector(
+                            ".message-row:not(.pending-assistant)",
+                        );
+                        if (userRow) {
+                            userRow.scrollIntoView({
+                                behavior: "instant",
+                                block: "end",
+                            });
+                        }
                         assistantText = "";
 
                         while (true) {
@@ -7320,6 +7387,17 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         );
                         streamingBubble.classList.remove("thinking");
                         streamingBubble.innerHTML = "";
+
+                        // Lock scroll position when streaming starts
+                        const userRow = pendingAssistantNode.querySelector(
+                            ".message-row:not(.pending-assistant)",
+                        );
+                        if (userRow) {
+                            userRow.scrollIntoView({
+                                behavior: "instant",
+                                block: "end",
+                            });
+                        }
                         assistantText = "";
 
                         while (true) {
@@ -7344,8 +7422,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                             streamingBubble.innerHTML =
                                                 marked.parse(assistantText);
                                             enhanceCodeBlocks();
-                                            messagesDiv.scrollTop =
-                                                messagesDiv.scrollHeight;
+                                            // Don't force scroll during streaming - let user scroll freely
                                         }
                                     } catch (e) {
                                         // Skip invalid JSON
@@ -7508,6 +7585,17 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         );
                         streamingBubble.classList.remove("thinking");
                         streamingBubble.innerHTML = "";
+
+                        // Lock scroll position when streaming starts
+                        const userRow = pendingAssistantNode.querySelector(
+                            ".message-row:not(.pending-assistant)",
+                        );
+                        if (userRow) {
+                            userRow.scrollIntoView({
+                                behavior: "instant",
+                                block: "end",
+                            });
+                        }
                         assistantText = "";
 
                         while (true) {
@@ -7532,8 +7620,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                             streamingBubble.innerHTML =
                                                 marked.parse(assistantText);
                                             enhanceCodeBlocks();
-                                            messagesDiv.scrollTop =
-                                                messagesDiv.scrollHeight;
+                                            // Don't force scroll during streaming - let user scroll freely
                                         }
                                     } catch (e) {
                                         // Skip invalid JSON
@@ -7696,6 +7783,17 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         );
                         streamingBubble.classList.remove("thinking");
                         streamingBubble.innerHTML = "";
+
+                        // Lock scroll position when streaming starts
+                        const userRow = pendingAssistantNode.querySelector(
+                            ".message-row:not(.pending-assistant)",
+                        );
+                        if (userRow) {
+                            userRow.scrollIntoView({
+                                behavior: "instant",
+                                block: "end",
+                            });
+                        }
                         assistantText = "";
 
                         while (true) {
@@ -7720,8 +7818,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                                             streamingBubble.innerHTML =
                                                 marked.parse(assistantText);
                                             enhanceCodeBlocks();
-                                            messagesDiv.scrollTop =
-                                                messagesDiv.scrollHeight;
+                                            // Don't force scroll during streaming - let user scroll freely
                                         }
                                     } catch (e) {
                                         // Skip invalid JSON
