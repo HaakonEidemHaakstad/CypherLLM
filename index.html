@@ -2352,6 +2352,7 @@
                                     type="file"
                                     id="attach-file-input"
                                     multiple
+                                    accept=".txt,.pdf,.docx,.jpg,.jpeg,.png,.gif,.webp,.bmp,.tiff,.tif,.svg,.ico,image/*,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                                     style="display: none"
                                 />
 
@@ -2585,6 +2586,7 @@
 
             const MODEL_LISTS = {
                 openai: [
+                    "gpt-5.2",
                     "gpt-5.1",
                     "gpt-5-mini",
                     "gpt-5-nano",
@@ -4750,10 +4752,17 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                     "image/png",
                     "image/gif",
                     "image/webp",
+                    "image/bmp",
+                    "image/tiff",
+                    "image/svg+xml",
+                    "image/x-icon",
+                    "image/vnd.microsoft.icon",
                 ];
                 return (
                     imageTypes.includes(file.type) ||
-                    /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name)
+                    /\.(jpg|jpeg|png|gif|webp|bmp|tiff?|svg|ico)$/i.test(
+                        file.name,
+                    )
                 );
             }
 
@@ -4763,7 +4772,14 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             }
 
             function handleAttachedFiles(files) {
-                if (!files.length) return;
+                if (!files.length) {
+                    console.log("handleAttachedFiles: No files provided");
+                    return;
+                }
+
+                console.log(
+                    `handleAttachedFiles: Processing ${files.length} file(s)`,
+                );
                 const readers = [];
 
                 // File size limit: 2MB for binary files (base64 encoding increases size by ~33%)
@@ -4771,13 +4787,22 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 const MAX_BINARY_FILE_SIZE = 2 * 1024 * 1024;
 
                 for (const file of files) {
+                    console.log(
+                        `Processing file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`,
+                    );
+
                     const isPDF = isPDFFile(file);
                     const isDOCX = isDOCXFile(file);
                     const isImage = isImageFile(file);
                     const useBase64 = needsBase64(file);
 
+                    console.log(
+                        `  isPDF: ${isPDF}, isDOCX: ${isDOCX}, isImage: ${isImage}, useBase64: ${useBase64}`,
+                    );
+
                     // Check file size for binary files - reject if too large
                     if (useBase64 && file.size > MAX_BINARY_FILE_SIZE) {
+                        console.log(`  File too large, skipping`);
                         updateStatus(
                             `Error: File "${file.name}" (${(file.size / 1024 / 1024).toFixed(2)}MB) exceeds 2MB limit. Binary files larger than 2MB will cause context window overflow. Please use a smaller file.`,
                             "error",
@@ -4817,10 +4842,18 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                 Promise.all(readers)
                     .then(() => {
-                        updateStatus(
-                            `Loaded ${attachedFiles.length} attached file(s).`,
-                            "success",
-                        );
+                        if (readers.length === 0) {
+                            // All files were rejected (e.g., too large)
+                            updateStatus(
+                                "No files loaded. Files may exceed 2MB limit.",
+                                "warning",
+                            );
+                        } else {
+                            updateStatus(
+                                `Loaded ${readers.length} attached file(s).`,
+                                "success",
+                            );
+                        }
                         renderAttachments();
                         saveConversationToLocal();
                     })
@@ -5071,7 +5104,10 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             });
 
             attachFileInput.addEventListener("change", (e) => {
+                console.log("File input change event triggered");
+                console.log("e.target.files:", e.target.files);
                 const files = Array.from(e.target.files || []);
+                console.log("files array:", files);
                 handleAttachedFiles(files);
                 attachFileInput.value = "";
             });
@@ -6450,14 +6486,18 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         // Add web search tool for GPT-5.1 and compatible models
                         // Exclude nano models as they don't support tools
+                        // Note: web_search cannot be used with reasoning.effort for GPT-5
                         if (
                             (model.includes("gpt-5") ||
                                 model.includes("gpt-4")) &&
                             !model.includes("nano")
                         ) {
-                            requestBody.tools = [
-                                { type: "web_search_preview" },
-                            ];
+                            // Only add web_search if reasoning effort is not set
+                            if (reasoningEffort === "none") {
+                                requestBody.tools = [
+                                    { type: "web_search_preview" },
+                                ];
+                            }
                         }
 
                         // Enable streaming
