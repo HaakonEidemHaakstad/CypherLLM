@@ -1,6 +1,6 @@
 # CypherLLM
 
-A powerful, single-file web application for interacting with multiple AI providers through a clean, modern chat interface. Built with streaming responses, advanced context management, and support for file attachments.
+A powerful, single-file web application for interacting with multiple AI providers through a clean, modern chat interface. Built with advanced context management, and support for file attachments.
 
 **Version:** 2.2  
 **File:** `index.html` - completely self-contained (HTML + CSS + JavaScript)
