@@ -196,11 +196,6 @@ Click **⚙ Context** to access settings:
 3. **Active Context Pairs** - Recent messages (limited by Context Limit)
 4. **Token Counter** - Estimated usage
 2. **Custom Context Entries** - Quick notes and instructions always included in every request
-   - Add with input field and "Add" button (or press Enter)
-   - Entries are collapsed by default - click "Expand" to view full text
-   - Click "Delete" to remove an entry
-   - Distinguished by red theme (vs blue for pinned, green for active)
-   - Persisted in localStorage across sessions
 3. **Pinned Context Pairs** - Permanent conversation history
 4. **Active Context Pairs** - Recent messages (limited by Context Limit)
 5. **Token Counter** - Estimated usage
