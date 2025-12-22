@@ -2,7 +2,7 @@
 
 A powerful, single-file web application for interacting with multiple AI providers through a clean, modern chat interface. Built with streaming responses, advanced context management, and support for file attachments.
 
-**Version:** 2.1  
+**Version:** 2.2  
 **File:** `index.html` - completely self-contained (HTML + CSS + JavaScript)
 
 ---
@@ -26,6 +26,7 @@ A powerful, single-file web application for interacting with multiple AI provide
 
 ### Advanced Context Management
 - **System prompt** customization
+- **Custom context entries** - quick notes and instructions always included in context
 - **Pinned conversations** - keep important exchanges permanently in context
 - **Selective inclusion** - toggle which messages to include
 - **Context limit** control (0 = unlimited)
@@ -164,6 +165,7 @@ Click the status dot to view the **status log** with timestamps and detailed mes
 Open **Context Settings** (⚙ Context button) to see:
 - Estimated token usage
 - System prompt length
+- Custom context entries count
 - Pinned pairs count
 - Active context pairs
 - File attachments
@@ -193,6 +195,15 @@ Click **⚙ Context** to access settings:
 2. **Pinned Context Pairs** - Permanent conversation history
 3. **Active Context Pairs** - Recent messages (limited by Context Limit)
 4. **Token Counter** - Estimated usage
+2. **Custom Context Entries** - Quick notes and instructions always included in every request
+   - Add with input field and "Add" button (or press Enter)
+   - Entries are collapsed by default - click "Expand" to view full text
+   - Click "Delete" to remove an entry
+   - Distinguished by red theme (vs blue for pinned, green for active)
+   - Persisted in localStorage across sessions
+3. **Pinned Context Pairs** - Permanent conversation history
+4. **Active Context Pairs** - Recent messages (limited by Context Limit)
+5. **Token Counter** - Estimated usage
 
 **Context Limit**: Set how many recent message pairs to include (0 = unlimited)
 
@@ -269,11 +280,16 @@ Each chunk is:
 ### Context Management
 
 Three layers of context:
+Four layers of context:
 1. **System prompt** - always included
 2. **Pinned pairs** - user-selected permanent context
 3. **Recent pairs** - last N included pairs (controlled by Context Limit)
+2. **Custom context entries** - user-added notes and instructions, always included
+3. **Pinned pairs** - user-selected permanent conversation context
+4. **Recent pairs** - last N included pairs (controlled by Context Limit)
 
 Total context sent = System Prompt + Files + Pinned Pairs + Recent Pairs
+Total context sent = System Prompt + Custom Context + Files + Pinned Pairs + Recent Pairs
 
 ### File Processing
 
@@ -448,10 +464,12 @@ Contributions are welcome! This is a single-file project, so:
 
 ### Version 2.1 (Current)
 - ✨ Added Progressive Web App (PWA) support
+- ✨ Added Custom Context Entries feature for quick, always-included notes
 - ✨ Added mobile-optimized UI with safe area support for navigation bars
 - ✨ Enhanced number input controls with seamless button integration
 - 🔧 Removed chat name field for cleaner interface
 - 🔧 Fixed load function compatibility (no longer requires chat name in JSON)
+- 🔧 Fixed avatar rendering in custom context entries
 - 📱 Mobile input field positioning improvements for tablets
 
 ### Version 2.0
