@@ -2438,6 +2438,63 @@
 
                             <div class="settings-section">
                                 <label class="settings-label"
+                                    >Custom Context Entries</label
+                                >
+                                <div
+                                    style="
+                                        display: flex;
+                                        gap: 8px;
+                                        margin-bottom: 12px;
+                                    "
+                                >
+                                    <input
+                                        type="text"
+                                        id="custom-context-input"
+                                        placeholder="Add a quick context note..."
+                                        class="settings-input"
+                                        style="flex: 1"
+                                    />
+                                    <button
+                                        id="add-custom-context-btn"
+                                        style="
+                                            padding: 8px 16px;
+                                            border-radius: 8px;
+                                            border: none;
+                                            background: linear-gradient(
+                                                135deg,
+                                                #22c55e,
+                                                #4ade80
+                                            );
+                                            color: #052e16;
+                                            font-weight: 600;
+                                            cursor: pointer;
+                                            font-size: 13px;
+                                            white-space: nowrap;
+                                        "
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+                                <div
+                                    id="custom-context-list"
+                                    style="
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 6px;
+                                        font-size: 12px;
+                                    "
+                                >
+                                    <!-- Custom context entries will be added here -->
+                                </div>
+                                <div class="settings-hint">
+                                    Quick context entries that are always
+                                    included in your prompts. Great for
+                                    temporary instructions or preferences.
+                                </div>
+                            </div>
+
+                            <div class="settings-section">
+                                <label class="settings-label"
                                     >Pinned Context Pairs</label
                                 >
                                 <div
@@ -2547,6 +2604,7 @@
             const HISTORY_LIMIT_STORAGE_KEY = "chat_clone_history_limit";
             const PAGE_SIZE_STORAGE_KEY = "chat_clone_page_size";
             const CONTEXT_STORAGE_KEY = "chat_clone_context_prompt";
+            const CUSTOM_CONTEXT_STORAGE_KEY = "chat_clone_custom_context";
             const CHATNAME_STORAGE_KEY = "chat_clone_chat_name";
             const USER_AVATAR_STORAGE_KEY = "chat_clone_user_avatar";
             const ASSISTANT_AVATAR_OPENAI_KEY = "chat_clone_avatar_openai";
@@ -2644,6 +2702,7 @@
             let conversationPairs = [];
             let currentPage = 1;
             let attachedFiles = [];
+            let customContextEntries = [];
 
             // API Keys state
             let apiKeys = {
@@ -2694,6 +2753,15 @@
             const settingsView = document.getElementById("settings-view");
             const settingsContextInput = document.getElementById(
                 "settings-context-input",
+            );
+            const customContextInput = document.getElementById(
+                "custom-context-input",
+            );
+            const addCustomContextBtn = document.getElementById(
+                "add-custom-context-btn",
+            );
+            const customContextList = document.getElementById(
+                "custom-context-list",
             );
             const historyLimitDisplay = document.getElementById(
                 "history-limit-display",
@@ -3020,6 +3088,226 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 return currentChatName;
             }
 
+            // Custom context entries functions
+            function loadCustomContext() {
+                const saved = localStorage.getItem(CUSTOM_CONTEXT_STORAGE_KEY);
+                if (saved) {
+                    try {
+                        const parsed = JSON.parse(saved);
+                        // Convert old string format to new object format
+                        customContextEntries = parsed.map((entry) => {
+                            if (typeof entry === "string") {
+                                return { text: entry, collapsed: false };
+                            }
+                            return entry;
+                        });
+                    } catch (e) {
+                        customContextEntries = [];
+                    }
+                } else {
+                    customContextEntries = [];
+                }
+                renderCustomContextList();
+            }
+
+            function saveCustomContext() {
+                localStorage.setItem(
+                    CUSTOM_CONTEXT_STORAGE_KEY,
+                    JSON.stringify(customContextEntries),
+                );
+                updateTokenCounter();
+            }
+
+            function addCustomContext() {
+                const text = customContextInput.value.trim();
+                if (!text) return;
+
+                customContextEntries.push({
+                    text: text,
+                    collapsed: true,
+                });
+                customContextInput.value = "";
+                saveCustomContext();
+                renderCustomContextList();
+                updateStatus("Custom context entry added", "success");
+            }
+
+            function removeCustomContext(index) {
+                customContextEntries.splice(index, 1);
+                saveCustomContext();
+                renderCustomContextList();
+                updateStatus("Custom context entry removed", "success");
+            }
+
+            function renderCustomContextList() {
+                if (customContextEntries.length === 0) {
+                    customContextList.innerHTML =
+                        '<div style="color: var(--text-muted); font-style: italic;">No custom context entries yet</div>';
+                    return;
+                }
+
+                customContextList.innerHTML = "";
+
+                customContextEntries.forEach((entry, index) => {
+                    const entryText =
+                        typeof entry === "string" ? entry : entry.text;
+                    const isCollapsed = entry.collapsed !== false;
+
+                    // ===== COLLAPSED VIEW =====
+                    if (isCollapsed) {
+                        const row = document.createElement("div");
+                        row.className = "message-row collapsed-summary";
+                        row.style.marginBottom = "12px";
+                        row.style.borderLeft = "3px solid #ef4444";
+                        row.style.paddingLeft = "9px";
+                        row.style.background = "rgba(239, 68, 68, 0.05)";
+
+                        const userAvatar = document.createElement("div");
+                        userAvatar.className = "avatar user";
+                        renderUserAvatar(userAvatar);
+                        userAvatar.addEventListener("click", () => {
+                            avatarFileInput.click();
+                        });
+
+                        const content = document.createElement("div");
+                        content.className = "message-content";
+
+                        const meta = document.createElement("div");
+                        meta.className = "message-meta";
+
+                        const metaLeft = document.createElement("div");
+                        metaLeft.className = "meta-left";
+
+                        const label = document.createElement("span");
+                        label.textContent = "Custom Context";
+
+                        metaLeft.appendChild(label);
+                        meta.appendChild(metaLeft);
+
+                        const metaRight = document.createElement("div");
+                        metaRight.style.display = "inline-flex";
+                        metaRight.style.gap = "6px";
+
+                        const deleteBtn = document.createElement("button");
+                        deleteBtn.className = "copy-btn";
+                        deleteBtn.textContent = "Delete";
+                        deleteBtn.addEventListener("click", () => {
+                            removeCustomContext(index);
+                        });
+                        metaRight.appendChild(deleteBtn);
+
+                        const expandBtn = document.createElement("button");
+                        expandBtn.className = "copy-btn";
+                        expandBtn.textContent = "Expand";
+                        expandBtn.addEventListener("click", () => {
+                            customContextEntries[index] = {
+                                text: entryText,
+                                collapsed: false,
+                            };
+                            saveCustomContext();
+                            renderCustomContextList();
+                        });
+                        metaRight.appendChild(expandBtn);
+
+                        meta.appendChild(metaRight);
+
+                        const bubble = document.createElement("div");
+                        bubble.className = "collapsed-summary-bubble";
+
+                        const preview = entryText.slice(0, 80);
+                        bubble.textContent =
+                            (preview || "(empty)") +
+                            (entryText.length > 80 ? "…" : "");
+
+                        content.appendChild(meta);
+                        content.appendChild(bubble);
+
+                        row.appendChild(userAvatar);
+                        row.appendChild(content);
+                        customContextList.appendChild(row);
+                        return;
+                    }
+
+                    // ===== EXPANDED VIEW =====
+                    const userRow = document.createElement("div");
+                    userRow.className = "message-row";
+                    userRow.style.marginBottom = "12px";
+                    userRow.style.borderLeft = "3px solid #ef4444";
+                    userRow.style.paddingLeft = "9px";
+                    userRow.style.background = "rgba(239, 68, 68, 0.05)";
+
+                    const userAvatar = document.createElement("div");
+                    userAvatar.className = "avatar user";
+                    renderUserAvatar(userAvatar);
+                    userAvatar.addEventListener("click", () => {
+                        avatarFileInput.click();
+                    });
+
+                    const userContent = document.createElement("div");
+                    userContent.className = "message-content";
+
+                    const userMeta = document.createElement("div");
+                    userMeta.className = "message-meta";
+
+                    const metaLeft = document.createElement("div");
+                    metaLeft.className = "meta-left";
+
+                    const youLabel = document.createElement("span");
+                    youLabel.textContent = "Custom Context";
+
+                    metaLeft.appendChild(youLabel);
+                    userMeta.appendChild(metaLeft);
+
+                    const metaRight = document.createElement("div");
+                    metaRight.style.display = "inline-flex";
+                    metaRight.style.gap = "6px";
+
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.className = "copy-btn";
+                    deleteBtn.textContent = "Delete";
+                    deleteBtn.addEventListener("click", () => {
+                        removeCustomContext(index);
+                    });
+                    metaRight.appendChild(deleteBtn);
+
+                    const collapseBtn = document.createElement("button");
+                    collapseBtn.className = "copy-btn";
+                    collapseBtn.textContent = "Collapse";
+                    collapseBtn.addEventListener("click", () => {
+                        customContextEntries[index] = {
+                            text: entryText,
+                            collapsed: true,
+                        };
+                        saveCustomContext();
+                        renderCustomContextList();
+                    });
+                    metaRight.appendChild(collapseBtn);
+
+                    userMeta.appendChild(metaRight);
+
+                    const userBubble = document.createElement("div");
+                    userBubble.className = "message-bubble user";
+                    userBubble.textContent = entryText;
+
+                    userContent.appendChild(userMeta);
+                    userContent.appendChild(userBubble);
+                    userRow.appendChild(userAvatar);
+                    userRow.appendChild(userContent);
+
+                    customContextList.appendChild(userRow);
+                });
+
+                updateTokenCounter();
+            }
+
+            function getCustomContextText() {
+                if (customContextEntries.length === 0) return "";
+                const texts = customContextEntries.map((entry) =>
+                    typeof entry === "string" ? entry : entry.text,
+                );
+                return "\n\n" + texts.join("\n");
+            }
+
             // Calculate estimated token count for context
             function updateTokenCounter() {
                 let totalChars = 0;
@@ -3028,6 +3316,12 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 const systemPrompt = getContextPrompt();
                 if (systemPrompt) {
                     totalChars += systemPrompt.length;
+                }
+
+                // Add custom context entries
+                const customContext = getCustomContextText();
+                if (customContext) {
+                    totalChars += customContext.length;
                 }
 
                 // Add file instructions if any
@@ -4107,6 +4401,8 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         pendingAvatarProvider = null;
                     } else {
                         saveUserAvatar(dataUrl);
+                        // Re-render custom context list to show new user avatar
+                        renderCustomContextList();
                     }
 
                     // Re-render the page to update all avatars
@@ -6354,8 +6650,13 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                         const apiInput = [];
 
                         // Build context from system prompts and conversation history
-                        if (context || fileInstructions) {
-                            const systemContent = [context, fileInstructions]
+                        const customContext = getCustomContextText();
+                        if (context || fileInstructions || customContext) {
+                            const systemContent = [
+                                context,
+                                customContext,
+                                fileInstructions,
+                            ]
                                 .filter(Boolean)
                                 .join("\n\n");
 
@@ -6673,6 +6974,10 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         // Construct system instruction
                         let fullSystemInstruction = context || "";
+                        const customContext = getCustomContextText();
+                        if (customContext) {
+                            fullSystemInstruction += customContext;
+                        }
                         if (fileInstructions) {
                             fullSystemInstruction += "\n\n" + fileInstructions;
                         }
@@ -6852,6 +7157,14 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                             apiMessages.push({
                                 role: "system",
                                 content: context,
+                            });
+                        }
+
+                        const customContext = getCustomContextText();
+                        if (customContext) {
+                            apiMessages.push({
+                                role: "system",
+                                content: customContext,
                             });
                         }
 
@@ -7137,6 +7450,10 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         // Construct system prompt
                         let fullSystemPrompt = context || "";
+                        const customContext = getCustomContextText();
+                        if (customContext) {
+                            fullSystemPrompt += customContext;
+                        }
                         if (fileInstructions) {
                             fullSystemPrompt += "\n\n" + fileInstructions;
                         }
@@ -7369,6 +7686,10 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         // Construct system prompt
                         let fullSystemPrompt = context || "";
+                        const customContext = getCustomContextText();
+                        if (customContext) {
+                            fullSystemPrompt += customContext;
+                        }
                         if (fileInstructions) {
                             fullSystemPrompt += "\n\n" + fileInstructions;
                         }
@@ -7567,6 +7888,10 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         // Construct system prompt
                         let fullSystemPrompt = context || "";
+                        const customContext = getCustomContextText();
+                        if (customContext) {
+                            fullSystemPrompt += customContext;
+                        }
                         if (fileInstructions) {
                             fullSystemPrompt += "\n\n" + fileInstructions;
                         }
@@ -7765,6 +8090,10 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
 
                         // Construct system prompt
                         let fullSystemPrompt = context || "";
+                        const customContext = getCustomContextText();
+                        if (customContext) {
+                            fullSystemPrompt += customContext;
+                        }
                         if (fileInstructions) {
                             fullSystemPrompt += "\n\n" + fileInstructions;
                         }
@@ -7964,6 +8293,16 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 userInput.style.height = userInput.scrollHeight + "px";
             }
 
+            // ========= CUSTOM CONTEXT ENTRIES =========
+            addCustomContextBtn.addEventListener("click", addCustomContext);
+
+            customContextInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    addCustomContext();
+                }
+            });
+
             // ========= BACK TO TOP BUTTON =========
             messagesDiv.addEventListener("scroll", () => {
                 // Show button if scrolled down more than 200px
@@ -7988,6 +8327,7 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
             loadProviderAndModel();
             loadUserAvatar();
             loadAssistantAvatars();
+            loadCustomContext(); // Load after avatars so they render correctly
             updateApiKeyStatus();
             loadHistoryLimit();
             loadPageSize();
