@@ -6290,6 +6290,11 @@ If the user's input is flawed, tell them. If the user's input is dangerous, warn
                 currentChatName = "";
                 localStorage.setItem(CHATNAME_STORAGE_KEY, "");
 
+                // Clear custom context entries
+                customContextEntries = [];
+                localStorage.removeItem(CUSTOM_CONTEXT_STORAGE_KEY);
+                renderCustomContextList();
+
                 saveConversationToLocal();
 
                 // Reset export tracking
